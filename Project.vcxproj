@@ -84,10 +84,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\include;C:\Users\gldac\Documents\Visual Studio 2022\glm-0.9.9.8\glm;C:\VulkanSDK\1.3.246.1\Include;C:\Users\gldac\Documents\GitHub\CGProject\headers;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.246.1\Lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,12 +102,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\include;C:\Users\gldac\Documents\Visual Studio 2022\glm-0.9.9.8\glm;C:\VulkanSDK\1.3.246.1\Include;C:\Users\gldac\Documents\GitHub\CGProject\headers;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.246.1\Lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -112,14 +120,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.239.0\Include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glm-master\;C:\Users\julia\OneDrive\Área de Trabalho\POLIMI\Computer Graphics\Polimi\Project\Project\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\include;C:\Users\gldac\Documents\Visual Studio 2022\glm-0.9.9.8\glm;C:\VulkanSDK\1.3.246.1\Include;C:\Users\gldac\Documents\GitHub\CGProject\headers;C:\VulkanSDK\1.3.239.0\Include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glm-master\;C:\Users\julia\OneDrive\Área de Trabalho\POLIMI\Computer Graphics\Polimi\Project\Project\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.239.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.246.1\Lib;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.239.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,7 +138,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.239.0\Include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glm-master\;C:\Users\julia\OneDrive\Área de Trabalho\POLIMI\Computer Graphics\Polimi\Project\Project\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\include;C:\Users\gldac\Documents\Visual Studio 2022\glm-0.9.9.8\glm;C:\VulkanSDK\1.3.246.1\Include;C:\Users\gldac\Documents\GitHub\CGProject\headers;C:\VulkanSDK\1.3.239.0\Include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\include;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glm-master\;C:\Users\julia\OneDrive\Área de Trabalho\POLIMI\Computer Graphics\Polimi\Project\Project\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -138,8 +146,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.239.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\gldac\Documents\Visual Studio 2022\glfw-3.3.8.bin.WIN64\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.246.1\Lib;C:\Users\julia\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\VulkanSDK\1.3.239.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
