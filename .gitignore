@@ -366,3 +366,6 @@ FodyWeavers.xsd
 *.suo
 Browse.VC.db
 *.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.db-opendb
