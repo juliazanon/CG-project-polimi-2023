@@ -369,5 +369,6 @@ Browse.VC.db
 *.VC.db-shm
 *.VC.db-wal
 *.VC.db-opendb
-*.tlog
+*.read.1.tlog
+*.write.1.tlog
 *.log
