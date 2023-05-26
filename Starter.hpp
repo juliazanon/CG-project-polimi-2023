@@ -1826,7 +1826,7 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		if(glfwGetKey(window, GLFW_KEY_DOWN)) {
 			r.x = 1.0f;
 		}
-		if(glfwGetKey(window, GLFW_KEY_Q)) {
+		/*if(glfwGetKey(window, GLFW_KEY_Q)) {
 			r.z = 1.0f;
 		}
 		if(glfwGetKey(window, GLFW_KEY_E)) {
@@ -1850,7 +1850,7 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		}
 		if(glfwGetKey(window, GLFW_KEY_F)) {
 			m.y = -1.0f;
-		}
+		}*/
 		
 		fire = glfwGetKey(window, GLFW_KEY_SPACE);
 		handleGamePad(GLFW_JOYSTICK_1,m,r,fire);

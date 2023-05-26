@@ -55,7 +55,7 @@ class Assignment15 : public BaseProject {
 	int currScene = 0;
 	float Ar;
 	glm::mat4 ViewPrj;
-	glm::vec3 Pos = glm::vec3(5.0f,3.5f,8.66f);
+	glm::vec3 Pos = glm::vec3(0.0f,0.0f,0.0f);
 	glm::vec3 cameraPos;
 	float Yaw = glm::radians(30.0f);
 	float Pitch = glm::radians(22.5f);
@@ -339,32 +339,57 @@ class Assignment15 : public BaseProject {
 		// Rotation
 		Yaw = Yaw - ROT_SPEED * deltaT * r.y;
 		Pitch = Pitch + ROT_SPEED * deltaT * r.x;
-		Pitch  =  Pitch < minPitch ? minPitch :
-				   (Pitch > maxPitch ? maxPitch : Pitch);
-		Roll   = Roll   - ROT_SPEED * deltaT * r.z;
-		Roll   = Roll < glm::radians(-175.0f) ? glm::radians(-175.0f) :
-				   (Roll > glm::radians( 175.0f) ? glm::radians( 175.0f) : Roll);
 
 //std::cout << Pos.x << ", " << Pos.y << ", " << Pos.z << ", " << Yaw << ", " << Pitch << ", " << Roll << "\n";
 
 		// Final world matrix computaiton
-		World = glm::translate(glm::mat4(1), Pos) * glm::rotate(glm::mat4(1.0f), Yaw, glm::vec3(0,1,0));
-		
-		// Projection
-		glm::mat4 Prj = glm::perspective(FOVy, Ar, nearPlane, farPlane);
-		Prj[1][1] *= -1;
+		//World = glm::translate(glm::mat4(1), Pos) * glm::rotate(glm::mat4(1.0f), Yaw, glm::vec3(0,1,0));
+		//
+		//// Projection
+		//glm::mat4 Prj = glm::perspective(FOVy, Ar, nearPlane, farPlane);
+		//Prj[1][1] *= -1;
 
-		// View
-		// Target
-		glm::vec3 target = Pos + glm::vec3(0.0f, camHeight, 0.0f);
+		//// View
+		//// Target
+		//glm::vec3 target = Pos + glm::vec3(0.0f, camHeight, 0.0f);
 
-		// Camera position, depending on Yaw parameter, but not character direction
-		cameraPos = World * glm::vec4(0.0f, camHeight + camDist * sin(Pitch), camDist * cos(Pitch), 1.0);
-		// Damping of camera
-		glm::mat4 View = glm::rotate(glm::mat4(1.0f), -Roll, glm::vec3(0,0,1)) *
-						 glm::lookAt(cameraPos, target, glm::vec3(0,1,0));
+		//// Camera position, depending on Yaw parameter, but not character direction
+		//cameraPos = World * glm::vec4(0.0f, camHeight + camDist * sin(Pitch), camDist * cos(Pitch), 1.0);
+		//// Damping of camera
+		//glm::mat4 View = glm::rotate(glm::mat4(1.0f), -Roll, glm::vec3(0,0,1)) *
+		//				 glm::lookAt(cameraPos, target, glm::vec3(0,1,0));
 
-		ViewPrj = Prj * View;
+		//ViewPrj = Prj * View;
+		World = MakeWorldMatrix(Pos, glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
+
+		// camera rotation
+		glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
+		glm::mat4 World2 = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
+
+		glm::vec3 camPos = World2 * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
+		glm::vec3 LookAt = Pos + glm::vec3(0, camHeight, 0);
+
+		ViewPrj = MakeViewProjectionMatrix(Ar, camPos, LookAt);
+	}
+
+	glm::mat4 MakeViewProjectionMatrix(float Ar, glm::vec3 camPos, glm::vec3 Pos) {
+		glm::mat4 Mp = glm::perspective(glm::radians(90.0f), Ar, 0.1f, 50.0f);
+		Mp[1][1] *= -1;
+
+		glm::mat4 Mv = glm::lookAt(camPos, Pos, glm::vec3(0, 1, 0));
+
+		return Mp * Mv;
+	}
+
+	glm::mat4 MakeWorldMatrix(glm::vec3 pos, glm::quat rQ, glm::vec3 size) {
+		// creates and returns a World Matrix that positions the object at <pos>,
+		// orients it according to <rQ>, and scales it according to the sizes
+		// given in vector <size>
+		glm::mat4 M =
+			glm::translate(glm::mat4(1.0), pos) *
+			glm::mat4(rQ);
+		glm::scale(glm::mat4(1.0), size);
+		return M;
 	}
 	
 	void createBoxMesh(std::vector<Vertex> &vDef, std::vector<uint32_t> &vIdx);
