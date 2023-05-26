@@ -361,3 +361,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+####
+*.suo
+Browse.VC.db
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.db-opendb
+**/*.read.1.tlog
+**/*.write.1.tlog
+**/*.log
