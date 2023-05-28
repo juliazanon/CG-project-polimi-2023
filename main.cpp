@@ -546,175 +546,171 @@ class Assignment15 : public BaseProject {
 		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		gubo.eyePos = cameraPos;
 
-		switch(currScene) {
-		  case 0:
-			  // top front
-			  ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				  glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 2.1));
-			  ubo.mvpMat = ViewPrj * ubo.mMat;
-			  DS4.map(currentImage, &ubo, sizeof(ubo), 0);
-			  DS4.map(currentImage, &gubo, sizeof(gubo), 1);
+		// top front
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS4.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS4.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			  ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				  glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 2.1));
-			  ubo.mvpMat = ViewPrj * ubo.mMat;
-			  DS5.map(currentImage, &ubo, sizeof(ubo), 0);
-			  DS5.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS5.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS5.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			  ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				  glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 2.1));
-			  ubo.mvpMat = ViewPrj * ubo.mMat;
-			  DS6.map(currentImage, &ubo, sizeof(ubo), 0);
-			  DS6.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS6.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS6.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			 // middle front
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) * 
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS1.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS1.map(currentImage, &gubo, sizeof(gubo), 1);
+		// middle front
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS1.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS1.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) * 
-				glm::translate(glm::mat4(1), glm::vec3(0, 0, 2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS2.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS2.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, 0, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS2.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS2.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS3.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS3.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS3.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS3.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// bottom front
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS7.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS7.map(currentImage, &gubo, sizeof(gubo), 1);
+		// bottom front
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS7.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS7.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS8.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS8.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS8.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS8.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS9.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS9.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS9.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS9.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// top middle
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS10.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS10.map(currentImage, &gubo, sizeof(gubo), 1);
+		// top middle
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS10.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS10.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS11.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS11.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS11.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS11.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS12.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS12.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS12.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS12.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// middle middle
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS13.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS13.map(currentImage, &gubo, sizeof(gubo), 1);
+		// middle middle
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS13.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS13.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS14.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS14.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS14.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS14.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// bottom middle
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS15.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS15.map(currentImage, &gubo, sizeof(gubo), 1);
+		// bottom middle
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS15.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS15.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS16.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS16.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS16.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS16.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 0));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS17.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS17.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 0));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS17.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS17.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// top back
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS18.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS18.map(currentImage, &gubo, sizeof(gubo), 1);
+		// top back
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS18.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS18.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(0, 2.1, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS19.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS19.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS19.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS19.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS20.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS20.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS20.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS20.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// middle back
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS21.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS21.map(currentImage, &gubo, sizeof(gubo), 1);
+		// middle back
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS21.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS21.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(0, 0, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS22.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS22.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, 0, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS22.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS22.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, 0, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS23.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS23.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS23.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS23.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			// bottom back
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS24.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS24.map(currentImage, &gubo, sizeof(gubo), 1);
+		// bottom back
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS24.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS24.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(0, -2.1, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS25.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS25.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS25.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS25.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
-				glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, -2.1));
-			ubo.mvpMat = ViewPrj * ubo.mMat;
-			DS26.map(currentImage, &ubo, sizeof(ubo), 0);
-			DS26.map(currentImage, &gubo, sizeof(gubo), 1);
+		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, -2.1));
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		DS26.map(currentImage, &ubo, sizeof(ubo), 0);
+		DS26.map(currentImage, &gubo, sizeof(gubo), 1);
 
-			break;
-		}
 	}
 	
 	void GameLogic() {
