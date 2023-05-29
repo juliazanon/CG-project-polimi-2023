@@ -5,8 +5,7 @@
 
 
  std::vector<SingleText> demoText = {
-	{1, {"Building Toy Box", "", "", ""}, 0, 0},
-	{1, {"Mars", "", "", ""}, 0, 0}
+	{1, {"Rubiks cube", "", "", ""}, 0, 0}
 };
 
 // The uniform buffer object used in this example
@@ -25,15 +24,14 @@ struct GlobalUniformBufferObject {
 
 struct Vertex {
 	glm::vec3 pos;
-	glm::vec3 norm;
 	glm::vec2 UV;
 };
 
-class Assignment15;
-void GameLogic(Assignment15 *A, float Ar, glm::mat4 &ViewPrj, glm::mat4 &World);
+class Rubiks;
+void GameLogic(Rubiks *A, float Ar, glm::mat4 &ViewPrj, glm::mat4 &World);
 
 // MAIN ! 
-class Assignment15 : public BaseProject {
+class Rubiks : public BaseProject {
 	protected:
 	// Here you list all the Vulkan objects you need:
 	
@@ -53,7 +51,6 @@ class Assignment15 : public BaseProject {
 	TextMaker txt;
 	
 	// Other application parameters
-	int currScene = 0;
 	float Ar;
 	glm::mat4 ViewPrj;
 	glm::vec3 Pos = glm::vec3(0.0f,0.0f,0.0f);
@@ -72,9 +69,9 @@ class Assignment15 : public BaseProject {
 		initialBackgroundColor = {0.0f, 0.015f, 0.03f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 40;
-		texturesInPool = 4;
-		setsInPool = 27;
+		uniformBlocksInPool = 26;
+		texturesInPool = 30;
+		setsInPool = 30;
 		
 		Ar = 4.0f / 3.0f;
 	}
@@ -94,9 +91,8 @@ class Assignment15 : public BaseProject {
 					// first  element : the binding number
 					// second element : the type of element (buffer or texture)
 					// third  element : the pipeline stage where it will be used
-					{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT},
-					{1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
-					{2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}
+					{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
+					{1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}
 				});
 
 		// Vertex descriptors
@@ -105,28 +101,21 @@ class Assignment15 : public BaseProject {
 				}, {
 				  {0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos),
 				         sizeof(glm::vec3), POSITION},
-				  {0, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, norm),
-				         sizeof(glm::vec3), NORMAL},
-				  {0, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, UV),
+				  {0, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, UV),
 				         sizeof(glm::vec2), UV}
 				});
 
 		// Pipelines [Shader couples]
 		// The last array, is a vector of pointer to the layouts of the sets that will
 		// be used in this pipeline. The first element will be set 0, and so on..
-		P1.init(this, &VD, "shaders/BlinnVert.spv", "shaders/BlinnFrag.spv", {&DSL1});
+		P1.init(this, &VD, "shaders/ShaderVert.spv", "shaders/ShaderFrag.spv", {&DSL1});
 		P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
  								    VK_CULL_MODE_NONE, false);
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
-		createBoxMesh(M1.vertices, M1.indices);
-		M1.initMesh(this, &VD);
+		M1.init(this, &VD, "Models/Cube.obj", OBJ);
 
-		createSphereMesh(M2.vertices, M2.indices);
-		M2.initMesh(this, &VD);
-		
-		T1.init(this, "textures/TBs_20140623_1_02.png");
-		T2.init(this, "textures/2k_mars.jpg");
+		T1.init(this, "textures/Checker.png");
 		
 		txt.init(this, &demoText);
 	}
@@ -138,158 +127,132 @@ class Assignment15 : public BaseProject {
 
 		DS1.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 				});
 
 		DS2.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 				});
 
 		DS3.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS4.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS5.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS6.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS7.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS8.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS9.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS10.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS11.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS12.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS13.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS14.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS15.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS16.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS17.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS18.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS19.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS20.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS21.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS22.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS23.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS24.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS25.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		DS26.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
-					{2, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T1}
 			});
 
 		txt.pipelinesAndDescriptorSetsInit();
@@ -325,6 +288,7 @@ class Assignment15 : public BaseProject {
 		DS24.cleanup();
 		DS25.cleanup();
 		DS26.cleanup();
+
 		txt.pipelinesAndDescriptorSetsCleanup();
 	}
 
@@ -348,117 +312,114 @@ class Assignment15 : public BaseProject {
 	// You send to the GPU all the objects you want to draw,
 	// with their buffers and textures
 	void populateCommandBuffer(VkCommandBuffer commandBuffer, int currentImage) {
-		switch(currScene) {
-		  case 0:
-			P1.bind(commandBuffer);
-			M1.bind(commandBuffer);
-			DS1.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		P1.bind(commandBuffer);
+		M1.bind(commandBuffer);
 
-			DS2.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS1.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS3.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS2.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS4.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS3.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS5.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS4.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS6.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS5.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS7.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS6.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS8.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS7.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS9.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS8.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS10.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS9.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS11.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS10.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS12.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS11.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS13.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS12.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS14.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS13.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS15.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS14.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS16.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS15.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS17.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS16.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS18.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS17.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS19.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS18.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS20.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS19.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS21.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS20.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS22.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS21.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS23.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS22.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS24.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS23.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS25.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+		DS24.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-			DS26.bind(commandBuffer, P1, currentImage);
-			vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
-			break;
-		}
+		DS25.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
 
-		txt.populateCommandBuffer(commandBuffer, currentImage, currScene);
+		DS26.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+
+		txt.populateCommandBuffer(commandBuffer, currentImage);
 	}
 
 	// Here is where you update the uniforms.
@@ -466,23 +427,6 @@ class Assignment15 : public BaseProject {
 	void updateUniformBuffer(uint32_t currentImage) {
 		static bool debounce = false;
 		static int curDebounce = 0;
-//std::cout << xpos << " " << ypos << " " << m_dx << " " << m_dy << "\n";
-
-//		if(glfwGetKey(window, GLFW_KEY_SPACE)) {
-//			if(!debounce) {
-//				debounce = true;
-//				curDebounce = GLFW_KEY_SPACE;
-//				currScene = (currScene+1) % 2;
-//				std::cout << "Scene : " << currScene << "\n";
-////				Pos = glm::vec3(0,0,currScene == 0 ? 10 : 8);
-//				RebuildPipeline();
-//			}
-//		} else {
-//			if((curDebounce == GLFW_KEY_SPACE) && debounce) {
-//				debounce = false;
-//				curDebounce = 0;
-//			}
-//		}
 
 		static bool showNormal = false;
 		static bool showUV = false;
@@ -522,9 +466,6 @@ class Assignment15 : public BaseProject {
 		
 		GameLogic();
 		
-//printMat4("ViewPrj", ViewPrj);
-//printMat4("WM", WM);
-		
 		UniformBufferObject ubo{};								
 		// Here is where you actually update your uniforms
 
@@ -551,165 +492,156 @@ class Assignment15 : public BaseProject {
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS4.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS4.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS5.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS5.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS6.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS6.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		// middle front
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS1.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS1.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS2.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS2.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS3.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS3.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		// bottom front
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS7.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS7.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS8.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS8.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS9.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS9.map(currentImage, &gubo, sizeof(gubo), 1);
 
 		// top middle
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS10.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS10.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS11.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS11.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS12.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS12.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		// middle middle
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS13.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS13.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS14.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS14.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		// bottom middle
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS15.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS15.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS16.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS16.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 0));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS17.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS17.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		// top back
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS18.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS18.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS19.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS19.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS20.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS20.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		// middle back
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS21.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS21.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS22.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS22.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS23.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS23.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		// bottom back
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS24.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS24.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS25.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS25.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, -2.1));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		DS26.map(currentImage, &ubo, sizeof(ubo), 0);
-		DS26.map(currentImage, &gubo, sizeof(gubo), 1);
+
 
 	}
 	
@@ -754,26 +686,6 @@ class Assignment15 : public BaseProject {
 		Yaw = Yaw - ROT_SPEED * deltaT * r.y;
 		Pitch = Pitch + ROT_SPEED * deltaT * r.x;
 
-//std::cout << Pos.x << ", " << Pos.y << ", " << Pos.z << ", " << Yaw << ", " << Pitch << ", " << Roll << "\n";
-
-		// Final world matrix computaiton
-		//World = glm::translate(glm::mat4(1), Pos) * glm::rotate(glm::mat4(1.0f), Yaw, glm::vec3(0,1,0));
-		//
-		//// Projection
-		//glm::mat4 Prj = glm::perspective(FOVy, Ar, nearPlane, farPlane);
-		//Prj[1][1] *= -1;
-
-		//// View
-		//// Target
-		//glm::vec3 target = Pos + glm::vec3(0.0f, camHeight, 0.0f);
-
-		//// Camera position, depending on Yaw parameter, but not character direction
-		//cameraPos = World * glm::vec4(0.0f, camHeight + camDist * sin(Pitch), camDist * cos(Pitch), 1.0);
-		//// Damping of camera
-		//glm::mat4 View = glm::rotate(glm::mat4(1.0f), -Roll, glm::vec3(0,0,1)) *
-		//				 glm::lookAt(cameraPos, target, glm::vec3(0,1,0));
-
-		//ViewPrj = Prj * View;
 		World = MakeWorldMatrix(Pos, glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
 
 		// camera rotation
@@ -805,17 +717,11 @@ class Assignment15 : public BaseProject {
 		glm::scale(glm::mat4(1.0), size);
 		return M;
 	}
-	
-	void createBoxMesh(std::vector<Vertex> &vDef, std::vector<uint32_t> &vIdx);
-	void createSphereMesh(std::vector<Vertex> &vDef, std::vector<uint32_t> &vIdx);
 };
-
-#include "primGen.hpp"
-
 
 // This is the main: probably you do not need to touch this!
 int main() {
-    Assignment15 app;
+    Rubiks app;
 
     try {
         app.run();
