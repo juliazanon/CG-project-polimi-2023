@@ -20,9 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="primGen.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Starter.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>

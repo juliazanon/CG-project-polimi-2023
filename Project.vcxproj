@@ -22,7 +22,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="primGen.hpp" />
     <ClInclude Include="Starter.hpp" />
     <ClInclude Include="TextMaker.hpp" />
   </ItemGroup>

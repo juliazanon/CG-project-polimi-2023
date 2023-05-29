@@ -1850,13 +1850,13 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		}
 		if(glfwGetKey(window, GLFW_KEY_F)) {
 			m.y = -1.0f;
-		}*/
+		}
 		
 		fire = glfwGetKey(window, GLFW_KEY_SPACE);
 		handleGamePad(GLFW_JOYSTICK_1,m,r,fire);
 		handleGamePad(GLFW_JOYSTICK_2,m,r,fire);
 		handleGamePad(GLFW_JOYSTICK_3,m,r,fire);
-		handleGamePad(GLFW_JOYSTICK_4,m,r,fire);
+		handleGamePad(GLFW_JOYSTICK_4,m,r,fire);*/
 	}
 };
 
