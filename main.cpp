@@ -45,7 +45,7 @@ class Assignment15 : public BaseProject {
 	Pipeline P1;
 
 	// Models, textures and Descriptors (values assigned to the uniforms)
-	Model<Vertex> M1, M2;
+	Model<Vertex> M1;
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13, 
 		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26;
 	Texture T1, T2;
@@ -332,10 +332,8 @@ class Assignment15 : public BaseProject {
 	// You also have to destroy the pipelines
 	void localCleanup() {
 		T1.cleanup();
-		T2.cleanup();
 
 		M1.cleanup();
-		M2.cleanup();
 
 		DSL1.cleanup();
 		
