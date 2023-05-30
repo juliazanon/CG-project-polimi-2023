@@ -34,6 +34,8 @@ void GameLogic(Rubiks *A, float Ar, glm::mat4 &ViewPrj, glm::mat4 &World);
 class Rubiks : public BaseProject {
 protected:
 	// Here you list all the Vulkan objects you need:
+	
+
 	glm::mat4 Rotations[27];
 	int selFace = 0;
 	int cube[3][3][3] = { {{0, 1, 2}, { 3, 4, 5}, { 6, 7, 8,}},
@@ -434,6 +436,17 @@ protected:
 	// Here is where you update the uniforms.
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
+
+
+		static auto startTime = std::chrono::high_resolution_clock::now();
+		static float lastTime = 0.0f;
+		auto currentTime = std::chrono::high_resolution_clock::now();
+		float time = std::chrono::duration<float, std::chrono::seconds::period>
+			(currentTime - startTime).count();
+		float deltaT = time - lastTime;
+		lastTime = time;
+		const float rotSpeed = glm::radians(45.0f);
+
 		static bool debounce = false;
 		static int curDebounce = 0;
 
@@ -498,8 +511,6 @@ protected:
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE)) {
 			if (changed == false) {
-
-				std::cout << changed;
 				changed = true;
 				selFace++;
 				selFace = selFace % 9;
@@ -704,38 +715,117 @@ protected:
 
 	}
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
-		float ang = dir * glm::radians(45.0f);
+		float ang = dir * glm::radians(90.0f);
 		if (faceID < 3) {
+			//rotation on z axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
-					Rotations[cube[faceID][j][i]] = Rotations[cube[faceID][j][i]] *
-						glm::mat4(glm::cos(ang), glm::sin(ang), 0, 0,
+					
+					//cube rotation through rotation matrix
+					Rotations[cube[faceID][j][i]] =
+						 glm::mat4(glm::cos(ang), glm::sin(ang), 0, 0,
 							-glm::sin(ang), glm::cos(ang), 0, 0,
 							0, 0, 1, 0,
-							0, 0, 0, 1);
+							0, 0, 0, 1) * Rotations[cube[faceID][j][i]];
+
 				}
+			}
+			//logic model adjustment
+			if (dir == 1) {
+				int t = cube[faceID % 3][0][0];
+				cube[faceID % 3][0][0] = cube[faceID % 3][0][2];
+				cube[faceID % 3][0][2] = cube[faceID % 3][2][2];
+				cube[faceID % 3][2][2] = cube[faceID % 3][2][0];
+				cube[faceID % 3][2][0] = t;
+				t = cube[faceID % 3][0][1];
+				cube[faceID % 3][0][1] = cube[faceID % 3][1][2];
+				cube[faceID % 3][1][2] = cube[faceID % 3][2][1];
+				cube[faceID % 3][2][1] = cube[faceID % 3][1][0];
+				cube[faceID % 3][1][0] = t;
+			}
+			if (dir == -1) {
+				int t = cube[faceID % 3][0][0];
+				cube[faceID % 3][0][0] = cube[faceID % 3][2][0];
+				cube[faceID % 3][2][0] = cube[faceID % 3][2][2];
+				cube[faceID % 3][2][2] = cube[faceID % 3][0][2];
+				cube[faceID % 3][0][2] = t;
+				t = cube[faceID % 3][0][1];
+				cube[faceID % 3][0][1] = cube[faceID % 3][1][0];
+				cube[faceID % 3][1][0] = cube[faceID % 3][2][1];
+				cube[faceID % 3][2][1] = cube[faceID % 3][1][2];
+				cube[faceID % 3][1][2] = t;
 			}
 		}
 		else if (faceID < 6) {
+			//rotation on y axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
-					Rotations[cube[j][faceID % 3][i]] = Rotations[cube[j][faceID % 3][i]] *
+					Rotations[cube[j][faceID % 3][i]] =
 						glm::mat4(glm::cos(ang), 0, glm::sin(ang), 0,
 							0, 1, 0, 0,
 							-glm::sin(ang), 0, glm::cos(ang), 0,
-							0, 0, 0, 1);
+							0, 0, 0, 1) * Rotations[cube[j][faceID % 3][i]];
 				}
+			}//logic model adjustment
+			if (dir == 1) {
+				int t = cube[0][faceID % 3][0];
+				cube[0][faceID % 3][0] = cube[0][faceID % 3][2];
+				cube[0][faceID % 3][2] = cube[2][faceID % 3][2];
+				cube[2][faceID % 3][2] = cube[2][faceID % 3][0];
+				cube[2][faceID % 3][0] = t;
+				t = cube[0][faceID % 3][1];
+				cube[0][faceID % 3][1] = cube[1][faceID % 3][2];
+				cube[1][faceID % 3][2] = cube[2][faceID % 3][1];
+				cube[2][faceID % 3][1] = cube[1][faceID % 3][0];
+				cube[1][faceID % 3][0] = t;
+			}
+			if (dir == -1) {
+				int t = cube[0][faceID % 3][0];
+				cube[0][faceID % 3][0] = cube[2][faceID % 3][0];
+				cube[2][faceID % 3][0] = cube[2][faceID % 3][2];
+				cube[2][faceID % 3][2] = cube[0][faceID % 3][2];
+				cube[0][faceID % 3][2] = t;
+				t = cube[0][faceID % 3][1];
+				cube[0][faceID % 3][1] = cube[1][faceID % 3][0];
+				cube[1][faceID % 3][0] = cube[2][faceID % 3][1];
+				cube[2][faceID % 3][1] = cube[1][faceID % 3][2];
+				cube[1][faceID % 3][2] = t;
 			}
 		}
 		else if (faceID < 9) {
+			//rotation on x axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
-					Rotations[cube[j][i][faceID % 3]] = Rotations[cube[j][i][faceID % 3]] *
+					Rotations[cube[j][i][faceID % 3]] = 
 						glm::mat4(1, 0, 0, 0,
 							0, glm::cos(ang), glm::sin(ang), 0,
 							0, -glm::sin(ang), glm::cos(ang), 0,
-							0, 0, 0, 1);
+							0, 0, 0, 1) * Rotations[cube[j][i][faceID % 3]];
 				}
+			}//logic model adjustment
+			if (dir == 1) {
+				int t = cube[0][0][faceID % 3];
+				cube[0][0][faceID % 3] = cube[0][2][faceID % 3];
+				cube[0][2][faceID % 3] = cube[2][2][faceID % 3];
+				cube[2][2][faceID % 3] = cube[2][0][faceID % 3];
+				cube[2][0][faceID % 3] = t;
+				t = cube[0][1][faceID % 3];
+				cube[0][1][faceID % 3] = cube[1][2][faceID % 3];
+				cube[1][2][faceID % 3] = cube[2][1][faceID % 3];
+				cube[2][1][faceID % 3] = cube[1][0][faceID % 3];
+				cube[1][0][faceID % 3] = t;
+			}
+			if (dir == -1) {
+				int t = cube[0][0][faceID % 3];
+				cube[0][0][faceID % 3] = cube[2][0][faceID % 3];
+				cube[2][0][faceID % 3] = cube[2][2][faceID % 3];
+				cube[2][2][faceID % 3] = cube[0][2][faceID % 3];
+				cube[0][2][faceID % 3] = t;
+				t = cube[0][1][faceID % 3];
+				cube[0][1][faceID % 3] = cube[1][0][faceID % 3];
+				cube[1][0][faceID % 3] = cube[2][1][faceID % 3];
+				cube[2][1][faceID % 3] = cube[1][2][faceID % 3];
+				cube[1][2][faceID % 3] = t;
 			}
 		}
 		else {
