@@ -36,7 +36,7 @@ protected:
 	// Here you list all the Vulkan objects you need:
 	
 
-	glm::mat4 Rotations[27];
+	glm::mat4 Rotations[27][3];
 	int selFace = 0;
 	int cube[3][3][3] = { {{0, 1, 2}, { 3, 4, 5}, { 6, 7, 8,}},
 			{{9, 10, 11}, { 12, 13, 14}, { 15, 16, 17,}},
@@ -96,7 +96,9 @@ protected:
 		// Descriptor Layouts [what will be passed to the shaders]
 
 		for (int i = 0; i < 27; i++) {
-			Rotations[i] = glm::mat4(1);
+			for (int j = 0; j < 3; j++) {
+				Rotations[i][j] = glm::mat4(1);
+			}
 		};
 
 		DSL1.init(this, {
@@ -557,176 +559,191 @@ protected:
 		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		gubo.eyePos = cameraPos;
 
+		static int a = 2;
+		static int b = 0;
+		static int c = 1;
+
 		// top front
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[0] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[0][a] * Rotations[0][b] * Rotations[0][c] * ubo.mMat;
 		DS1.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[1] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[1][a] * Rotations[1][b] * Rotations[1][c] * ubo.mMat;
 		DS2.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[2] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[2][a] * Rotations[2][b] * Rotations[2][c] * ubo.mMat;
 		DS3.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		// middle front
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[3] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[3][a] * Rotations[3][b] * Rotations[3][c] * ubo.mMat;
 		DS4.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[4] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[4][a] * Rotations[4][b] * Rotations[4][c] * ubo.mMat;
 		DS5.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[5] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[5][a] * Rotations[5][b] * Rotations[5][c] * ubo.mMat;
 		DS6.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		// bottom front
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[6] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[6][a] * Rotations[6][b] * Rotations[6][c] * ubo.mMat;
 		DS7.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[7] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[7][a] * Rotations[7][b] * Rotations[7][c] * ubo.mMat;
 		DS8.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[8] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[8][a] * Rotations[8][b] * Rotations[8][c] * ubo.mMat;
 		DS9.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		
 		// top middle
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[9] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[9][a] * Rotations[9][b] * Rotations[9][c] * ubo.mMat;
 		DS10.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[10] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[10][a] * Rotations[10][b] * Rotations[10][c] * ubo.mMat;
 		DS11.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[11] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[11][a] * Rotations[11][b] * Rotations[11][c] * ubo.mMat;
 		DS12.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		// middle middle
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 0));
-		ubo.mvpMat = ViewPrj * Rotations[12] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[12][a] * Rotations[12][b] * Rotations[12][c] * ubo.mMat;
 		DS13.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 0));
-		ubo.mvpMat = ViewPrj * Rotations[14] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[14][a] * Rotations[14][b] * Rotations[14][c] * ubo.mMat;
 		DS14.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		// bottom middle
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[15] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[15][a] * Rotations[15][b] * Rotations[15][c] * ubo.mMat;
 		DS15.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[16] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[16][a] * Rotations[16][b] * Rotations[16][c] * ubo.mMat;
 		DS16.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[17] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[17][a] * Rotations[17][b] * Rotations[17][c] * ubo.mMat;
 		DS17.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		// top back
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[18] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[18][a] * Rotations[18][b] * Rotations[18][c] * ubo.mMat;
 		DS18.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[19] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[19][a] * Rotations[19][b] * Rotations[19][c] * ubo.mMat;
 		DS19.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[20] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[20][a] * Rotations[20][b] * Rotations[20][c] * ubo.mMat;
 		DS20.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		// middle back
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[21] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[21][a] * Rotations[21][b] * Rotations[21][c] * ubo.mMat;
 		DS21.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[22] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[22][a] * Rotations[22][b] * Rotations[22][c] * ubo.mMat;
 		DS22.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[23] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[23][a] * Rotations[23][b] * Rotations[23][c] * ubo.mMat;
 		DS23.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		// bottom back
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[24] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[24][a] * Rotations[24][b] * Rotations[24][c] * ubo.mMat;
 		DS24.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[25] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[25][a] * Rotations[25][b] * Rotations[25][c] * ubo.mMat;
 		DS25.map(currentImage, &ubo, sizeof(ubo), 0);
 
 
 		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[26] * ubo.mMat;
+		ubo.mvpMat = ViewPrj * Rotations[26][a] * Rotations[26][b] * Rotations[26][c] * ubo.mMat;
 		DS26.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		
 
 	}
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
+		std::cout << faceID;
 		float ang = dir * glm::radians(90.0f);
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				for (int k = 0; k < 3; k++) {
+					std::cout << "/" << cube[i][j][k] << "/";
+
+				}
+				std::cout << " ";
+			}
+			std::cout << '\n';
+		}
 		if (faceID < 3) {
 			//rotation on z axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					
 					//cube rotation through rotation matrix
-					Rotations[cube[faceID][j][i]] =
+					Rotations[cube[faceID][i][j]][2] =
 						 glm::mat4(glm::cos(ang), glm::sin(ang), 0, 0,
 							-glm::sin(ang), glm::cos(ang), 0, 0,
 							0, 0, 1, 0,
-							0, 0, 0, 1) * Rotations[cube[faceID][j][i]];
+							0, 0, 0, 1) * Rotations[cube[faceID][i][j]][2];
 
 				}
 			}
@@ -756,15 +773,16 @@ protected:
 				cube[faceID % 3][1][2] = t;
 			}
 		}
+
 		else if (faceID < 6) {
 			//rotation on y axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
-					Rotations[cube[j][faceID % 3][i]] =
+					Rotations[cube[j][faceID % 3][i]][1] =
 						glm::mat4(glm::cos(ang), 0, glm::sin(ang), 0,
 							0, 1, 0, 0,
 							-glm::sin(ang), 0, glm::cos(ang), 0,
-							0, 0, 0, 1) * Rotations[cube[j][faceID % 3][i]];
+							0, 0, 0, 1) * Rotations[cube[j][faceID % 3][i]][1];
 				}
 			}//logic model adjustment
 			if (dir == 1) {
@@ -796,11 +814,11 @@ protected:
 			//rotation on x axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
-					Rotations[cube[j][i][faceID % 3]] = 
+					Rotations[cube[j][i][faceID % 3]][0] =
 						glm::mat4(1, 0, 0, 0,
 							0, glm::cos(ang), glm::sin(ang), 0,
 							0, -glm::sin(ang), glm::cos(ang), 0,
-							0, 0, 0, 1) * Rotations[cube[j][i][faceID % 3]];
+							0, 0, 0, 1) * Rotations[cube[j][i][faceID % 3]][0];
 				}
 			}//logic model adjustment
 			if (dir == 1) {
@@ -831,6 +849,7 @@ protected:
 		else {
 
 		}
+		
 	}
 
 	void GameLogic() {
