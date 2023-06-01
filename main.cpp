@@ -3,6 +3,7 @@
 #include "Starter.hpp"
 #include "TextMaker.hpp"
 
+# define M_PI           3.14159265358979323846  /* pi */
 
  std::vector<SingleText> demoText = {
 	{1, {"Rubiks cube", "", "", ""}, 0, 0}
@@ -57,11 +58,10 @@ class Rubiks : public BaseProject {
 	glm::vec3 cameraPos;
 	float Yaw = glm::radians(30.0f);
 	float Pitch = glm::radians(22.5f);
-	float Roll = glm::radians(0.0f);
 
 	// Here you set the main application parameters
 	void setWindowParameters() {
-		// window size, titile and initial background
+		// window size, title and initial background
 		windowWidth = 800;
 		windowHeight = 600;
 		windowTitle = "Rubiks project";
@@ -651,58 +651,36 @@ class Rubiks : public BaseProject {
 		const float farPlane = 100.f;
 		// Camera target height and distance
 		const float camHeight = 0;
-		const float camDist = 2;
-		// Camera Pitch limits
-		const float minPitch = glm::radians(-60.0f);
-		const float maxPitch = glm::radians(60.0f);
+		const float camDist = 2; // radius
 		// Rotation and motion speed
 		const float ROT_SPEED = glm::radians(120.0f);
-		const float MOVE_SPEED = 2.0f;
 
 		// Integration with the timers and the controllers
 		float deltaT;
 		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
-		bool fire = false;
-		getSixAxis(deltaT, m, r, fire);
+		getSixAxis(deltaT, m, r);
 
 		// Game Logic implementation
-		// Current Player Position - statc variable make sure its value remain unchanged in subsequent calls to the procedure
-
-		// To be done in the assignment
 		ViewPrj = glm::mat4(1);
-		glm::mat4 World = glm::mat4(1);
-		
+
 		// World
-		// Position
-		glm::vec3 ux = glm::rotate(glm::mat4(1.0f), Yaw, glm::vec3(0,1,0)) * glm::vec4(1,0,0,1);
-		glm::vec3 uz = glm::rotate(glm::mat4(1.0f), Yaw, glm::vec3(0,1,0)) * glm::vec4(0,0,-1,1);
-		Pos = Pos + MOVE_SPEED * m.x * ux * deltaT;
-		Pos = Pos + MOVE_SPEED * m.y * glm::vec3(0,1,0) * deltaT;
-		Pos.y = Pos.y < 0.0f ? 0.0f : Pos.y;
-		Pos = Pos + MOVE_SPEED * m.z * uz * deltaT;
 		// Rotation
-		Yaw = Yaw - ROT_SPEED * deltaT * r.y;
-		Pitch = Pitch + ROT_SPEED * deltaT * r.x;
+		Yaw = Yaw + ROT_SPEED * deltaT * r.y;
+		Pitch = Pitch - ROT_SPEED * deltaT * r.x;
 
-		World = MakeWorldMatrix(Pos, glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
-
-		// camera rotation
 		glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
-		glm::mat4 World2 = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
+		glm::mat4 World = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
 
-		glm::vec3 camPos = World2 * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
-		glm::vec3 LookAt = Pos + glm::vec3(0, camHeight, 0);
-
-		ViewPrj = MakeViewProjectionMatrix(Ar, camPos, LookAt);
-	}
-
-	glm::mat4 MakeViewProjectionMatrix(float Ar, glm::vec3 camPos, glm::vec3 Pos) {
+		glm::vec3 camPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
+		glm::mat4 Mv = glm::lookAt(camPos, Pos, glm::vec3(0, 1, 0));
+		if (cos(Pitch) < 0.001) {
+			Mv = glm::lookAt(camPos, Pos, glm::vec3(0, -1, 0));
+		}
+		
 		glm::mat4 Mp = glm::perspective(glm::radians(90.0f), Ar, 0.1f, 50.0f);
 		Mp[1][1] *= -1;
 
-		glm::mat4 Mv = glm::lookAt(camPos, Pos, glm::vec3(0, 1, 0));
-
-		return Mp * Mv;
+		ViewPrj = Mp * Mv;
 	}
 
 	glm::mat4 MakeWorldMatrix(glm::vec3 pos, glm::quat rQ, glm::vec3 size) {
