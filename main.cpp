@@ -874,15 +874,22 @@ protected:
 
 		// World
 		// Rotation
-		Yaw = Yaw + ROT_SPEED * deltaT * r.y;
-		Pitch = Pitch - ROT_SPEED * deltaT * r.x;
+		
+		Pitch -= ROT_SPEED * deltaT * r.x;
+		glm::mat4 Mv = glm::mat4(1);
+		if (cos(Pitch) >= 0.001) {
+			Yaw += ROT_SPEED * deltaT * r.y;
+			glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
+			glm::mat4 World = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
 
-		glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
-		glm::mat4 World = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
-
-		glm::vec3 camPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
-		glm::mat4 Mv = glm::lookAt(camPos, Pos, glm::vec3(0, 1, 0));
-		if (cos(Pitch) < 0.001) {
+			glm::vec3 camPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
+			Mv = glm::lookAt(camPos, Pos, glm::vec3(0, 1, 0));
+		}
+		else {
+			Yaw -= ROT_SPEED * deltaT * r.y;
+			glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
+			glm::mat4 World = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
+			glm::vec3 camPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
 			Mv = glm::lookAt(camPos, Pos, glm::vec3(0, -1, 0));
 		}
 		
