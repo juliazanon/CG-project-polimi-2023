@@ -10,21 +10,26 @@
 };
 
 // The uniform buffer object used in this example
-struct UniformBufferObject {
-	alignas(16) glm::mat4 mvpMat;
-	alignas(16) glm::mat4 mMat;
-	alignas(16) glm::mat4 nMat;
-};
+ struct MeshUniformBlock {
+	 alignas(4) float amb;
+	 alignas(4) float gamma;
+	 alignas(16) glm::vec3 sColor;
+	 alignas(16) glm::mat4 mvpMat;
+	 alignas(16) glm::mat4 mMat;
+	 alignas(16) glm::mat4 nMat;
+ };
 
-struct GlobalUniformBufferObject {
-	alignas(16) glm::vec3 selector;
-	alignas(16) glm::vec3 lightDir;
-	alignas(16) glm::vec4 lightColor;
-	alignas(16) glm::vec3 eyePos;
-};
+ struct GlobalUniformBlock {
+	 alignas(16) glm::vec3 DlightDir;
+	 alignas(16) glm::vec3 DlightColor;
+	 alignas(16) glm::vec3 AmbLightColor;
+	 alignas(16) glm::vec3 eyePos;
+ };
+
 
 struct Vertex {
 	glm::vec3 pos;
+	glm::vec3 norm;
 	glm::vec2 UV;
 };
 
@@ -35,7 +40,6 @@ void GameLogic(Rubiks *A, float Ar, glm::mat4 &ViewPrj, glm::mat4 &World);
 class Rubiks : public BaseProject {
 protected:
 	// Here you list all the Vulkan objects you need:
-	
 
 	glm::mat4 Rotations[27][3];
 	int selFace = 0;
@@ -45,17 +49,22 @@ protected:
 
 
 	// Descriptor Layouts [what will be passed to the shaders]
-	DescriptorSetLayout DSL1;
+	DescriptorSetLayout DSL, DSLGubo;
 
 	// Pipelines [Shader couples]
 	VertexDescriptor VD;
 	Pipeline P1;
 
 	// Models, textures and Descriptors (values assigned to the uniforms)
-	Model<Vertex> M1;
+	Model<Vertex> Cube;
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13, 
-		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26;
+		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26,
+		DSGubo;
 	Texture T1, T2;
+
+	MeshUniformBlock ubo1, ubo2, ubo3, ubo4, ubo5, ubo6, ubo7, ubo8, ubo9, ubo10, ubo11, ubo12,
+		ubo13, ubo14, ubo15, ubo16, ubo17, ubo18, ubo19, ubo20, ubo21, ubo22, ubo23, ubo24, ubo25, ubo26;
+	GlobalUniformBlock gubo;
 
 	TextMaker txt;
 	
@@ -77,7 +86,7 @@ protected:
 		initialBackgroundColor = {0.0f, 0.015f, 0.03f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 26;
+		uniformBlocksInPool = 27;
 		texturesInPool = 30;
 		setsInPool = 30;
 		
@@ -101,7 +110,7 @@ protected:
 			}
 		};
 
-		DSL1.init(this, {
+		DSL.init(this, {
 					// this array contains the binding:
 					// first  element : the binding number
 					// second element : the type of element (buffer or texture)
@@ -110,25 +119,31 @@ protected:
 					{1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}
 				});
 
+		DSLGubo.init(this, {
+					{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS}
+			});
+
 		// Vertex descriptors
 		VD.init(this, {
 				  {0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX}
 				}, {
 				  {0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos),
 				         sizeof(glm::vec3), POSITION},
-				  {0, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, UV),
+				  {0, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, norm),
+						 sizeof(glm::vec3), NORMAL},
+				  {0, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, UV),
 				         sizeof(glm::vec2), UV}
 				});
 
 		// Pipelines [Shader couples]
 		// The last array, is a vector of pointer to the layouts of the sets that will
 		// be used in this pipeline. The first element will be set 0, and so on..
-		P1.init(this, &VD, "shaders/ShaderVert.spv", "shaders/ShaderFrag.spv", {&DSL1});
-		P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
- 								    VK_CULL_MODE_NONE, false);
+		P1.init(this, &VD, "shaders/ShaderVert.spv", "shaders/ShaderFrag.spv", {&DSLGubo, &DSL});
+		/*P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
+ 								    VK_CULL_MODE_NONE, false);*/
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
-		M1.init(this, &VD, "Models/Cube.obj", OBJ);
+		Cube.init(this, &VD, "Models/Cube.obj", OBJ);
 
 		T1.init(this, "textures/Checker.png");
 		
@@ -140,134 +155,138 @@ protected:
 		// This creates a new pipeline (with the current surface), using its shaders
 		P1.create();
 
-		DS1.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS1.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 				});
 
-		DS2.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS2.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 				});
 
-		DS3.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS3.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS4.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS4.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS5.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS5.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS6.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS6.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS7.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS7.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS8.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS8.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS9.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS9.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS10.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS10.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS11.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS11.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS12.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS12.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS13.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS13.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS14.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS14.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS15.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS15.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS16.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS16.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS17.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS17.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS18.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS18.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS19.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS19.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS20.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS20.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS21.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS21.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS22.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS22.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS23.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS23.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS24.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS24.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS25.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS25.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
 
-		DS26.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+		DS26.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
+			});
+
+		DSGubo.init(this, &DSLGubo, {
+					{0, UNIFORM, sizeof(GlobalUniformBlock), nullptr}
 			});
 
 		txt.pipelinesAndDescriptorSetsInit();
@@ -304,6 +323,8 @@ protected:
 		DS25.cleanup();
 		DS26.cleanup();
 
+		DSGubo.cleanup();
+
 		txt.pipelinesAndDescriptorSetsCleanup();
 	}
 
@@ -312,9 +333,10 @@ protected:
 	void localCleanup() {
 		T1.cleanup();
 
-		M1.cleanup();
+		Cube.cleanup();
 
-		DSL1.cleanup();
+		DSL.cleanup();
+		DSLGubo.cleanup();
 		
 		P1.destroy();		
 		
@@ -325,112 +347,114 @@ protected:
 	// You send to the GPU all the objects you want to draw,
 	// with their buffers and textures
 	void populateCommandBuffer(VkCommandBuffer commandBuffer, int currentImage) {
+		DSGubo.bind(commandBuffer, P1, 0, currentImage);
+
 		P1.bind(commandBuffer);
-		M1.bind(commandBuffer);
+		Cube.bind(commandBuffer);
 
-		DS1.bind(commandBuffer, P1, currentImage);
+		DS1.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS2.bind(commandBuffer, P1, currentImage);
+		DS2.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS3.bind(commandBuffer, P1, currentImage);
+		DS3.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS4.bind(commandBuffer, P1, currentImage);
+		DS4.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS5.bind(commandBuffer, P1, currentImage);
+		DS5.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS6.bind(commandBuffer, P1, currentImage);
+		DS6.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS7.bind(commandBuffer, P1, currentImage);
+		DS7.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS8.bind(commandBuffer, P1, currentImage);
+		DS8.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS9.bind(commandBuffer, P1, currentImage);
+		DS9.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS10.bind(commandBuffer, P1, currentImage);
+		DS10.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS11.bind(commandBuffer, P1, currentImage);
+		DS11.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS12.bind(commandBuffer, P1, currentImage);
+		DS12.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS13.bind(commandBuffer, P1, currentImage);
+		DS13.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS14.bind(commandBuffer, P1, currentImage);
+		DS14.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS15.bind(commandBuffer, P1, currentImage);
+		DS15.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS16.bind(commandBuffer, P1, currentImage);
+		DS16.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS17.bind(commandBuffer, P1, currentImage);
+		DS17.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS18.bind(commandBuffer, P1, currentImage);
+		DS18.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS19.bind(commandBuffer, P1, currentImage);
+		DS19.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS20.bind(commandBuffer, P1, currentImage);
+		DS20.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS21.bind(commandBuffer, P1, currentImage);
+		DS21.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS22.bind(commandBuffer, P1, currentImage);
+		DS22.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS23.bind(commandBuffer, P1, currentImage);
+		DS23.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS24.bind(commandBuffer, P1, currentImage);
+		DS24.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS25.bind(commandBuffer, P1, currentImage);
+		DS25.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS26.bind(commandBuffer, P1, currentImage);
+		DS26.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
 		txt.populateCommandBuffer(commandBuffer, currentImage);
 	}
@@ -438,8 +462,6 @@ protected:
 	// Here is where you update the uniforms.
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
-
-
 		static auto startTime = std::chrono::high_resolution_clock::now();
 		static float lastTime = 0.0f;
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -535,188 +557,189 @@ protected:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
-		
+		// update camera
 		GameLogic();
-		
-		UniformBufferObject ubo{};								
+										
 		// Here is where you actually update your uniforms
 
 		// updates global uniforms
-		ubo.mMat = glm::mat4(1);
-		ubo.mvpMat = ViewPrj;
-		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
-		
-		float dang = Pitch + glm::radians(15.0f);
-
-		GlobalUniformBufferObject gubo{};
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(3));
-		ubo.mvpMat = ViewPrj * ubo.mMat;
-		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
-
-		gubo.selector = glm::vec3(showNormal || showUV ? 0 : 1, showNormal ? 1 : 0, showUV ? 1 : 0);
-		gubo.lightDir = glm::normalize(glm::vec3(1, 2, 3));
-		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		gubo.DlightDir = glm::normalize(glm::vec3(1, 2, 3));
+		gubo.DlightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		gubo.AmbLightColor = glm::vec3(0.1f);
 		gubo.eyePos = cameraPos;
+
+		DSGubo.map(currentImage, &gubo, sizeof(gubo), 0);
 
 		static int a = 2;
 		static int b = 0;
 		static int c = 1;
 
+		float ambIntensity = 5.0f;
+
 		// top front
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo1.amb = ambIntensity; ubo1.gamma = 180.0f; ubo1.sColor = glm::vec3(1.0f);
+		ubo1.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[0][a] * Rotations[0][b] * Rotations[0][c] * ubo.mMat;
-		DS1.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo1.mvpMat = ViewPrj * Rotations[0][a] * Rotations[0][b] * Rotations[0][c] * ubo1.mMat;
+		DS1.map(currentImage, &ubo1, sizeof(ubo1), 0);
 
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo2.amb = ambIntensity; ubo2.gamma = 180.0f; ubo2.sColor = glm::vec3(1.0f);
+		ubo2.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[1][a] * Rotations[1][b] * Rotations[1][c] * ubo.mMat;
-		DS2.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo2.mvpMat = ViewPrj * Rotations[1][a] * Rotations[1][b] * Rotations[1][c] * ubo2.mMat;
+		DS2.map(currentImage, &ubo2, sizeof(ubo2), 0);
 
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo3.amb = ambIntensity; ubo3.gamma = 180.0f; ubo3.sColor = glm::vec3(1.0f);
+		ubo3.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[2][a] * Rotations[2][b] * Rotations[2][c] * ubo.mMat;
-		DS3.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo3.mvpMat = ViewPrj * Rotations[2][a] * Rotations[2][b] * Rotations[2][c] * ubo3.mMat;
+		DS3.map(currentImage, &ubo3, sizeof(ubo3), 0);
 
 		// middle front
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo4.amb = ambIntensity; ubo4.gamma = 180.0f; ubo4.sColor = glm::vec3(1.0f);
+		ubo4.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[3][a] * Rotations[3][b] * Rotations[3][c] * ubo.mMat;
-		DS4.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo4.mvpMat = ViewPrj * Rotations[3][a] * Rotations[3][b] * Rotations[3][c] * ubo4.mMat;
+		DS4.map(currentImage, &ubo4, sizeof(ubo4), 0);
 
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo5.amb = ambIntensity; ubo5.gamma = 180.0f; ubo5.sColor = glm::vec3(1.0f);
+		ubo5.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[4][a] * Rotations[4][b] * Rotations[4][c] * ubo.mMat;
-		DS5.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo5.mvpMat = ViewPrj * Rotations[4][a] * Rotations[4][b] * Rotations[4][c] * ubo5.mMat;
+		DS5.map(currentImage, &ubo5, sizeof(ubo5), 0);
 
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo6.amb = ambIntensity; ubo6.gamma = 180.0f; ubo6.sColor = glm::vec3(1.0f);
+		ubo6.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[5][a] * Rotations[5][b] * Rotations[5][c] * ubo.mMat;
-		DS6.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo6.mvpMat = ViewPrj * Rotations[5][a] * Rotations[5][b] * Rotations[5][c] * ubo6.mMat;
+		DS6.map(currentImage, &ubo6, sizeof(ubo6), 0);
 
 		// bottom front
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo7.amb = ambIntensity; ubo7.gamma = 180.0f; ubo7.sColor = glm::vec3(1.0f);
+		ubo7.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[6][a] * Rotations[6][b] * Rotations[6][c] * ubo.mMat;
-		DS7.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo7.mvpMat = ViewPrj * Rotations[6][a] * Rotations[6][b] * Rotations[6][c] * ubo7.mMat;
+		DS7.map(currentImage, &ubo7, sizeof(ubo7), 0);
 
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo8.amb = ambIntensity; ubo8.gamma = 180.0f; ubo8.sColor = glm::vec3(1.0f);
+		ubo8.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[7][a] * Rotations[7][b] * Rotations[7][c] * ubo.mMat;
-		DS8.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo8.mvpMat = ViewPrj * Rotations[7][a] * Rotations[7][b] * Rotations[7][c] * ubo8.mMat;
+		DS8.map(currentImage, &ubo8, sizeof(ubo8), 0);
 
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo9.amb = ambIntensity; ubo9.gamma = 180.0f; ubo9.sColor = glm::vec3(1.0f);
+		ubo9.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 2.1));
-		ubo.mvpMat = ViewPrj * Rotations[8][a] * Rotations[8][b] * Rotations[8][c] * ubo.mMat;
-		DS9.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo9.mvpMat = ViewPrj * Rotations[8][a] * Rotations[8][b] * Rotations[8][c] * ubo9.mMat;
+		DS9.map(currentImage, &ubo9, sizeof(ubo9), 0);
 		
 		// top middle
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo10.amb = ambIntensity; ubo10.gamma = 180.0f; ubo10.sColor = glm::vec3(1.0f);
+		ubo10.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[9][a] * Rotations[9][b] * Rotations[9][c] * ubo.mMat;
-		DS10.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo10.mvpMat = ViewPrj * Rotations[9][a] * Rotations[9][b] * Rotations[9][c] * ubo10.mMat;
+		DS10.map(currentImage, &ubo10, sizeof(ubo10), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo11.amb = ambIntensity; ubo11.gamma = 180.0f; ubo11.sColor = glm::vec3(1.0f);
+		ubo11.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[10][a] * Rotations[10][b] * Rotations[10][c] * ubo.mMat;
-		DS11.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo11.mvpMat = ViewPrj * Rotations[10][a] * Rotations[10][b] * Rotations[10][c] * ubo11.mMat;
+		DS11.map(currentImage, &ubo11, sizeof(ubo11), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo12.amb = ambIntensity; ubo12.gamma = 180.0f; ubo12.sColor = glm::vec3(1.0f);
+		ubo12.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[11][a] * Rotations[11][b] * Rotations[11][c] * ubo.mMat;
-		DS12.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		ubo12.mvpMat = ViewPrj * Rotations[11][a] * Rotations[11][b] * Rotations[11][c] * ubo12.mMat;
+		DS12.map(currentImage, &ubo12, sizeof(ubo12), 0);
 
 		// middle middle
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo13.amb = ambIntensity; ubo13.gamma = 180.0f; ubo13.sColor = glm::vec3(1.0f);
+		ubo13.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 0));
-		ubo.mvpMat = ViewPrj * Rotations[12][a] * Rotations[12][b] * Rotations[12][c] * ubo.mMat;
-		DS13.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo13.mvpMat = ViewPrj * Rotations[12][a] * Rotations[12][b] * Rotations[12][c] * ubo13.mMat;
+		DS13.map(currentImage, &ubo13, sizeof(ubo13), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo14.amb = ambIntensity; ubo14.gamma = 180.0f; ubo14.sColor = glm::vec3(1.0f);
+		ubo14.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 0));
-		ubo.mvpMat = ViewPrj * Rotations[14][a] * Rotations[14][b] * Rotations[14][c] * ubo.mMat;
-		DS14.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		ubo14.mvpMat = ViewPrj * Rotations[14][a] * Rotations[14][b] * Rotations[14][c] * ubo14.mMat;
+		DS14.map(currentImage, &ubo14, sizeof(ubo14), 0);
 
 		// bottom middle
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo15.amb = ambIntensity; ubo15.gamma = 180.0f; ubo15.sColor = glm::vec3(1.0f);
+		ubo15.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[15][a] * Rotations[15][b] * Rotations[15][c] * ubo.mMat;
-		DS15.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo15.mvpMat = ViewPrj * Rotations[15][a] * Rotations[15][b] * Rotations[15][c] * ubo15.mMat;
+		DS15.map(currentImage, &ubo15, sizeof(ubo15), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo16.amb = ambIntensity; ubo16.gamma = 180.0f; ubo16.sColor = glm::vec3(1.0f);
+		ubo16.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[16][a] * Rotations[16][b] * Rotations[16][c] * ubo.mMat;
-		DS16.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo16.mvpMat = ViewPrj * Rotations[16][a] * Rotations[16][b] * Rotations[16][c] * ubo16.mMat;
+		DS16.map(currentImage, &ubo16, sizeof(ubo16), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo17.amb = ambIntensity; ubo17.gamma = 180.0f; ubo17.sColor = glm::vec3(1.0f);
+		ubo17.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 0));
-		ubo.mvpMat = ViewPrj * Rotations[17][a] * Rotations[17][b] * Rotations[17][c] * ubo.mMat;
-		DS17.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		ubo17.mvpMat = ViewPrj * Rotations[17][a] * Rotations[17][b] * Rotations[17][c] * ubo17.mMat;
+		DS17.map(currentImage, &ubo17, sizeof(ubo17), 0);
 
 		// top back
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo18.amb = ambIntensity; ubo18.gamma = 180.0f; ubo18.sColor = glm::vec3(1.0f);
+		ubo18.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[18][a] * Rotations[18][b] * Rotations[18][c] * ubo.mMat;
-		DS18.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo18.mvpMat = ViewPrj * Rotations[18][a] * Rotations[18][b] * Rotations[18][c] * ubo18.mMat;
+		DS18.map(currentImage, &ubo18, sizeof(ubo18), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo19.amb = ambIntensity; ubo19.gamma = 180.0f; ubo19.sColor = glm::vec3(1.0f);
+		ubo19.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[19][a] * Rotations[19][b] * Rotations[19][c] * ubo.mMat;
-		DS19.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo19.mvpMat = ViewPrj * Rotations[19][a] * Rotations[19][b] * Rotations[19][c] * ubo19.mMat;
+		DS19.map(currentImage, &ubo19, sizeof(ubo19), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo20.amb = ambIntensity; ubo20.gamma = 180.0f; ubo20.sColor = glm::vec3(1.0f);
+		ubo20.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[20][a] * Rotations[20][b] * Rotations[20][c] * ubo.mMat;
-		DS20.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		ubo20.mvpMat = ViewPrj * Rotations[20][a] * Rotations[20][b] * Rotations[20][c] * ubo20.mMat;
+		DS20.map(currentImage, &ubo20, sizeof(ubo20), 0);
 
 		// middle back
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo21.amb = ambIntensity; ubo21.gamma = 180.0f; ubo21.sColor = glm::vec3(1.0f);
+		ubo21.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[21][a] * Rotations[21][b] * Rotations[21][c] * ubo.mMat;
-		DS21.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo21.mvpMat = ViewPrj * Rotations[21][a] * Rotations[21][b] * Rotations[21][c] * ubo21.mMat;
+		DS21.map(currentImage, &ubo21, sizeof(ubo21), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo22.amb = ambIntensity; ubo22.gamma = 180.0f; ubo22.sColor = glm::vec3(1.0f);
+		ubo22.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[22][a] * Rotations[22][b] * Rotations[22][c] * ubo.mMat;
-		DS22.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo22.mvpMat = ViewPrj * Rotations[22][a] * Rotations[22][b] * Rotations[22][c] * ubo22.mMat;
+		DS22.map(currentImage, &ubo22, sizeof(ubo22), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo23.amb = ambIntensity; ubo23.gamma = 180.0f; ubo23.sColor = glm::vec3(1.0f);
+		ubo23.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[23][a] * Rotations[23][b] * Rotations[23][c] * ubo.mMat;
-		DS23.map(currentImage, &ubo, sizeof(ubo), 0);
-
+		ubo23.mvpMat = ViewPrj * Rotations[23][a] * Rotations[23][b] * Rotations[23][c] * ubo23.mMat;
+		DS23.map(currentImage, &ubo23, sizeof(ubo23), 0);
 
 		// bottom back
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo24.amb = ambIntensity; ubo24.gamma = 180.0f; ubo24.sColor = glm::vec3(1.0f);
+		ubo24.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[24][a] * Rotations[24][b] * Rotations[24][c] * ubo.mMat;
-		DS24.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo24.mvpMat = ViewPrj * Rotations[24][a] * Rotations[24][b] * Rotations[24][c] * ubo24.mMat;
+		DS24.map(currentImage, &ubo24, sizeof(ubo24), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo25.amb = ambIntensity; ubo25.gamma = 180.0f; ubo25.sColor = glm::vec3(1.0f);
+		ubo25.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[25][a] * Rotations[25][b] * Rotations[25][c] * ubo.mMat;
-		DS25.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo25.mvpMat = ViewPrj * Rotations[25][a] * Rotations[25][b] * Rotations[25][c] * ubo25.mMat;
+		DS25.map(currentImage, &ubo25, sizeof(ubo25), 0);
 
-
-		ubo.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
+		ubo26.amb = ambIntensity; ubo26.gamma = 180.0f; ubo26.sColor = glm::vec3(1.0f);
+		ubo26.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, -2.1));
-		ubo.mvpMat = ViewPrj * Rotations[26][a] * Rotations[26][b] * Rotations[26][c] * ubo.mMat;
-		DS26.map(currentImage, &ubo, sizeof(ubo), 0);
+		ubo26.mvpMat = ViewPrj * Rotations[26][a] * Rotations[26][b] * Rotations[26][c] * ubo26.mMat;
+		DS26.map(currentImage, &ubo26, sizeof(ubo26), 0);
 		
 
 	}
@@ -866,8 +889,9 @@ protected:
 
 		// Integration with the timers and the controllers
 		float deltaT;
+		bool fire;
 		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
-		getSixAxis(deltaT, m, r);
+		getSixAxis(deltaT, m, r, fire);
 
 		// Game Logic implementation
 		ViewPrj = glm::mat4(1);
@@ -882,15 +906,15 @@ protected:
 			glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
 			glm::mat4 World = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
 
-			glm::vec3 camPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
-			Mv = glm::lookAt(camPos, Pos, glm::vec3(0, 1, 0));
+			cameraPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
+			Mv = glm::lookAt(cameraPos, Pos, glm::vec3(0, 1, 0));
 		}
 		else {
 			Yaw -= ROT_SPEED * deltaT * r.y;
 			glm::quat qe = glm::quat(glm::vec3(0, Yaw, 0));
 			glm::mat4 World = MakeWorldMatrix(Pos, qe, glm::vec3(1, 1, 1));
-			glm::vec3 camPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
-			Mv = glm::lookAt(camPos, Pos, glm::vec3(0, -1, 0));
+			cameraPos = World * glm::vec4(0, camHeight + (camDist * sin(Pitch)), camDist * cos(Pitch), 1);
+			Mv = glm::lookAt(cameraPos, Pos, glm::vec3(0, -1, 0));
 		}
 		
 		glm::mat4 Mp = glm::perspective(glm::radians(90.0f), Ar, 0.1f, 50.0f);
