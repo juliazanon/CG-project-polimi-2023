@@ -289,7 +289,7 @@ struct DescriptorSet {
 	void init(BaseProject *bp, DescriptorSetLayout *L,
 		std::vector<DescriptorSetElement> E);
 	void cleanup();
-  	void bind(VkCommandBuffer commandBuffer, Pipeline &P, int currentImage);
+	void bind(VkCommandBuffer commandBuffer, Pipeline& P, int setId, int currentImage);
   	void map(int currentImage, void *src, int size, int slot);
 };
 
@@ -1807,7 +1807,7 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		double m_dy = ypos - old_ypos;
 		old_xpos = xpos; old_ypos = ypos;
 
-		const float MOUSE_RES = 10.0f;				
+		const float MOUSE_RES = 1.1f;				
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 			r.y = -m_dx / MOUSE_RES;
@@ -1850,13 +1850,13 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		}
 		if(glfwGetKey(window, GLFW_KEY_F)) {
 			m.y = -1.0f;
-		}*/
+		}
 		
 		fire = glfwGetKey(window, GLFW_KEY_SPACE);
 		handleGamePad(GLFW_JOYSTICK_1,m,r,fire);
 		handleGamePad(GLFW_JOYSTICK_2,m,r,fire);
 		handleGamePad(GLFW_JOYSTICK_3,m,r,fire);
-		handleGamePad(GLFW_JOYSTICK_4,m,r,fire);
+		handleGamePad(GLFW_JOYSTICK_4,m,r,fire);*/
 	}
 };
 
@@ -2797,12 +2797,12 @@ void DescriptorSet::cleanup() {
 	}
 }
 
-void DescriptorSet::bind(VkCommandBuffer commandBuffer, Pipeline &P,
-						 int currentImage) {
+void DescriptorSet::bind(VkCommandBuffer commandBuffer, Pipeline& P, int setId,
+	int currentImage) {
 	vkCmdBindDescriptorSets(commandBuffer,
-					VK_PIPELINE_BIND_POINT_GRAPHICS,
-					P.pipelineLayout, 0, 1, &descriptorSets[currentImage],
-					0, nullptr);
+		VK_PIPELINE_BIND_POINT_GRAPHICS,
+		P.pipelineLayout, setId, 1, &descriptorSets[currentImage],
+		0, nullptr);
 }
 
 void DescriptorSet::map(int currentImage, void *src, int size, int slot) {
