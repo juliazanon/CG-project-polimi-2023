@@ -60,6 +60,7 @@ protected:
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13, 
 		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26,
 		DSGubo;
+	DescriptorSet descriptorSets[26];
 	Texture T1, T2;
 
 	MeshUniformBlock ubo1, ubo2, ubo3, ubo4, ubo5, ubo6, ubo7, ubo8, ubo9, ubo10, ubo11, ubo12,
@@ -155,135 +156,162 @@ protected:
 		// This creates a new pipeline (with the current surface), using its shaders
 		P1.create();
 
+		// the ds array must be populated after being initialized
 		DS1.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 				});
+		descriptorSets[0] = DS1;
 
 		DS2.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 				});
+		descriptorSets[1] = DS2;
 
 		DS3.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[2] = DS3;
 
 		DS4.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[3] = DS4;
 
 		DS5.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[4] = DS5;
 
 		DS6.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[5] = DS6;
 
 		DS7.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[6] = DS7;
 
 		DS8.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[7] = DS8;
 
 		DS9.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[8] = DS9;
 
 		DS10.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[9] = DS10;
 
 		DS11.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[10] = DS11;
 
 		DS12.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[11] = DS12;
 
 		DS13.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[12] = DS13;
 
 		DS14.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[13] = DS14;
 
 		DS15.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[14] = DS15;
 
 		DS16.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[15] = DS16;
 
 		DS17.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[16] = DS17;
 
 		DS18.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[17] = DS18;
 
 		DS19.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[18] = DS19;
 
 		DS20.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[19] = DS20;
 
 		DS21.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[20] = DS21;
 
 		DS22.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[21] = DS22;
 
 		DS23.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[22] = DS23;
 
 		DS24.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[23] = DS24;
 
 		DS25.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[24] = DS25;
 
 		DS26.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
 					{1, TEXTURE, 0, &T1}
 			});
+		descriptorSets[25] = DS26;
 
 		DSGubo.init(this, &DSLGubo, {
 					{0, UNIFORM, sizeof(GlobalUniformBlock), nullptr}
@@ -296,32 +324,9 @@ protected:
 	void pipelinesAndDescriptorSetsCleanup() {
 		P1.cleanup();
 		
-		DS1.cleanup();
-		DS2.cleanup();
-		DS3.cleanup();
-		DS4.cleanup();
-		DS5.cleanup();
-		DS6.cleanup();
-		DS7.cleanup();
-		DS8.cleanup();
-		DS9.cleanup();
-		DS10.cleanup();
-		DS11.cleanup();
-		DS12.cleanup();
-		DS13.cleanup();
-		DS14.cleanup();
-		DS15.cleanup();
-		DS16.cleanup();
-		DS17.cleanup();
-		DS18.cleanup();
-		DS19.cleanup();
-		DS20.cleanup();
-		DS21.cleanup();
-		DS22.cleanup();
-		DS23.cleanup();
-		DS24.cleanup();
-		DS25.cleanup();
-		DS26.cleanup();
+		for (DescriptorSet ds : descriptorSets) {
+			ds.cleanup();
+		}
 
 		DSGubo.cleanup();
 
@@ -352,97 +357,11 @@ protected:
 		P1.bind(commandBuffer);
 		Cube.bind(commandBuffer);
 
-		DS1.bind(commandBuffer, P1, 1, currentImage);
+		for (DescriptorSet ds : descriptorSets) {
+			ds.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS2.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS3.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS4.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS5.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS6.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS7.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS8.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS9.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS10.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS11.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS12.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS13.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS14.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS15.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS16.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS17.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS18.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS19.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS20.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS21.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS22.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DS23.bind(commandBuffer, P1, 1, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
+		}
 
 		DS24.bind(commandBuffer, P1, 1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
@@ -581,167 +500,165 @@ protected:
 		ubo1.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 2.1));
 		ubo1.mvpMat = ViewPrj * Rotations[0][a] * Rotations[0][b] * Rotations[0][c] * ubo1.mMat;
-		DS1.map(currentImage, &ubo1, sizeof(ubo1), 0);
+		descriptorSets[0].map(currentImage, &ubo1, sizeof(ubo1), 0);
 
 		ubo2.amb = ambIntensity; ubo2.gamma = 180.0f; ubo2.sColor = glm::vec3(1.0f);
 		ubo2.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 2.1));
 		ubo2.mvpMat = ViewPrj * Rotations[1][a] * Rotations[1][b] * Rotations[1][c] * ubo2.mMat;
-		DS2.map(currentImage, &ubo2, sizeof(ubo2), 0);
+		descriptorSets[1].map(currentImage, &ubo2, sizeof(ubo2), 0);
 
 		ubo3.amb = ambIntensity; ubo3.gamma = 180.0f; ubo3.sColor = glm::vec3(1.0f);
 		ubo3.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 2.1));
 		ubo3.mvpMat = ViewPrj * Rotations[2][a] * Rotations[2][b] * Rotations[2][c] * ubo3.mMat;
-		DS3.map(currentImage, &ubo3, sizeof(ubo3), 0);
+		descriptorSets[2].map(currentImage, &ubo3, sizeof(ubo3), 0);
 
 		// middle front
 		ubo4.amb = ambIntensity; ubo4.gamma = 180.0f; ubo4.sColor = glm::vec3(1.0f);
 		ubo4.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 2.1));
 		ubo4.mvpMat = ViewPrj * Rotations[3][a] * Rotations[3][b] * Rotations[3][c] * ubo4.mMat;
-		DS4.map(currentImage, &ubo4, sizeof(ubo4), 0);
+		descriptorSets[3].map(currentImage, &ubo4, sizeof(ubo4), 0);
 
 		ubo5.amb = ambIntensity; ubo5.gamma = 180.0f; ubo5.sColor = glm::vec3(1.0f);
 		ubo5.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, 2.1));
 		ubo5.mvpMat = ViewPrj * Rotations[4][a] * Rotations[4][b] * Rotations[4][c] * ubo5.mMat;
-		DS5.map(currentImage, &ubo5, sizeof(ubo5), 0);
+		descriptorSets[4].map(currentImage, &ubo5, sizeof(ubo5), 0);
 
 		ubo6.amb = ambIntensity; ubo6.gamma = 180.0f; ubo6.sColor = glm::vec3(1.0f);
 		ubo6.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 2.1));
 		ubo6.mvpMat = ViewPrj * Rotations[5][a] * Rotations[5][b] * Rotations[5][c] * ubo6.mMat;
-		DS6.map(currentImage, &ubo6, sizeof(ubo6), 0);
+		descriptorSets[5].map(currentImage, &ubo6, sizeof(ubo6), 0);
 
 		// bottom front
 		ubo7.amb = ambIntensity; ubo7.gamma = 180.0f; ubo7.sColor = glm::vec3(1.0f);
 		ubo7.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 2.1));
 		ubo7.mvpMat = ViewPrj * Rotations[6][a] * Rotations[6][b] * Rotations[6][c] * ubo7.mMat;
-		DS7.map(currentImage, &ubo7, sizeof(ubo7), 0);
+		descriptorSets[6].map(currentImage, &ubo7, sizeof(ubo7), 0);
 
 		ubo8.amb = ambIntensity; ubo8.gamma = 180.0f; ubo8.sColor = glm::vec3(1.0f);
 		ubo8.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 2.1));
 		ubo8.mvpMat = ViewPrj * Rotations[7][a] * Rotations[7][b] * Rotations[7][c] * ubo8.mMat;
-		DS8.map(currentImage, &ubo8, sizeof(ubo8), 0);
+		descriptorSets[7].map(currentImage, &ubo8, sizeof(ubo8), 0);
 
 		ubo9.amb = ambIntensity; ubo9.gamma = 180.0f; ubo9.sColor = glm::vec3(1.0f);
 		ubo9.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 2.1));
 		ubo9.mvpMat = ViewPrj * Rotations[8][a] * Rotations[8][b] * Rotations[8][c] * ubo9.mMat;
-		DS9.map(currentImage, &ubo9, sizeof(ubo9), 0);
+		descriptorSets[8].map(currentImage, &ubo9, sizeof(ubo9), 0);
 		
 		// top middle
 		ubo10.amb = ambIntensity; ubo10.gamma = 180.0f; ubo10.sColor = glm::vec3(1.0f);
 		ubo10.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, 0));
 		ubo10.mvpMat = ViewPrj * Rotations[9][a] * Rotations[9][b] * Rotations[9][c] * ubo10.mMat;
-		DS10.map(currentImage, &ubo10, sizeof(ubo10), 0);
+		descriptorSets[9].map(currentImage, &ubo10, sizeof(ubo10), 0);
 
 		ubo11.amb = ambIntensity; ubo11.gamma = 180.0f; ubo11.sColor = glm::vec3(1.0f);
 		ubo11.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, 0));
 		ubo11.mvpMat = ViewPrj * Rotations[10][a] * Rotations[10][b] * Rotations[10][c] * ubo11.mMat;
-		DS11.map(currentImage, &ubo11, sizeof(ubo11), 0);
+		descriptorSets[10].map(currentImage, &ubo11, sizeof(ubo11), 0);
 
 		ubo12.amb = ambIntensity; ubo12.gamma = 180.0f; ubo12.sColor = glm::vec3(1.0f);
 		ubo12.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, 0));
 		ubo12.mvpMat = ViewPrj * Rotations[11][a] * Rotations[11][b] * Rotations[11][c] * ubo12.mMat;
-		DS12.map(currentImage, &ubo12, sizeof(ubo12), 0);
+		descriptorSets[11].map(currentImage, &ubo12, sizeof(ubo12), 0);
 
 		// middle middle
 		ubo13.amb = ambIntensity; ubo13.gamma = 180.0f; ubo13.sColor = glm::vec3(1.0f);
 		ubo13.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, 0));
 		ubo13.mvpMat = ViewPrj * Rotations[12][a] * Rotations[12][b] * Rotations[12][c] * ubo13.mMat;
-		DS13.map(currentImage, &ubo13, sizeof(ubo13), 0);
+		descriptorSets[12].map(currentImage, &ubo13, sizeof(ubo13), 0);
 
 		ubo14.amb = ambIntensity; ubo14.gamma = 180.0f; ubo14.sColor = glm::vec3(1.0f);
 		ubo14.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, 0));
 		ubo14.mvpMat = ViewPrj * Rotations[14][a] * Rotations[14][b] * Rotations[14][c] * ubo14.mMat;
-		DS14.map(currentImage, &ubo14, sizeof(ubo14), 0);
+		descriptorSets[13].map(currentImage, &ubo14, sizeof(ubo14), 0);
 
 		// bottom middle
 		ubo15.amb = ambIntensity; ubo15.gamma = 180.0f; ubo15.sColor = glm::vec3(1.0f);
 		ubo15.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, 0));
 		ubo15.mvpMat = ViewPrj * Rotations[15][a] * Rotations[15][b] * Rotations[15][c] * ubo15.mMat;
-		DS15.map(currentImage, &ubo15, sizeof(ubo15), 0);
+		descriptorSets[14].map(currentImage, &ubo15, sizeof(ubo15), 0);
 
 		ubo16.amb = ambIntensity; ubo16.gamma = 180.0f; ubo16.sColor = glm::vec3(1.0f);
 		ubo16.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, 0));
 		ubo16.mvpMat = ViewPrj * Rotations[16][a] * Rotations[16][b] * Rotations[16][c] * ubo16.mMat;
-		DS16.map(currentImage, &ubo16, sizeof(ubo16), 0);
+		descriptorSets[15].map(currentImage, &ubo16, sizeof(ubo16), 0);
 
 		ubo17.amb = ambIntensity; ubo17.gamma = 180.0f; ubo17.sColor = glm::vec3(1.0f);
 		ubo17.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, 0));
 		ubo17.mvpMat = ViewPrj * Rotations[17][a] * Rotations[17][b] * Rotations[17][c] * ubo17.mMat;
-		DS17.map(currentImage, &ubo17, sizeof(ubo17), 0);
+		descriptorSets[16].map(currentImage, &ubo17, sizeof(ubo17), 0);
 
 		// top back
 		ubo18.amb = ambIntensity; ubo18.gamma = 180.0f; ubo18.sColor = glm::vec3(1.0f);
 		ubo18.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 2.1, -2.1));
 		ubo18.mvpMat = ViewPrj * Rotations[18][a] * Rotations[18][b] * Rotations[18][c] * ubo18.mMat;
-		DS18.map(currentImage, &ubo18, sizeof(ubo18), 0);
+		descriptorSets[17].map(currentImage, &ubo18, sizeof(ubo18), 0);
 
 		ubo19.amb = ambIntensity; ubo19.gamma = 180.0f; ubo19.sColor = glm::vec3(1.0f);
 		ubo19.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 2.1, -2.1));
 		ubo19.mvpMat = ViewPrj * Rotations[19][a] * Rotations[19][b] * Rotations[19][c] * ubo19.mMat;
-		DS19.map(currentImage, &ubo19, sizeof(ubo19), 0);
+		descriptorSets[18].map(currentImage, &ubo19, sizeof(ubo19), 0);
 
 		ubo20.amb = ambIntensity; ubo20.gamma = 180.0f; ubo20.sColor = glm::vec3(1.0f);
 		ubo20.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 2.1, -2.1));
 		ubo20.mvpMat = ViewPrj * Rotations[20][a] * Rotations[20][b] * Rotations[20][c] * ubo20.mMat;
-		DS20.map(currentImage, &ubo20, sizeof(ubo20), 0);
+		descriptorSets[19].map(currentImage, &ubo20, sizeof(ubo20), 0);
 
 		// middle back
 		ubo21.amb = ambIntensity; ubo21.gamma = 180.0f; ubo21.sColor = glm::vec3(1.0f);
 		ubo21.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, 0, -2.1));
 		ubo21.mvpMat = ViewPrj * Rotations[21][a] * Rotations[21][b] * Rotations[21][c] * ubo21.mMat;
-		DS21.map(currentImage, &ubo21, sizeof(ubo21), 0);
+		descriptorSets[20].map(currentImage, &ubo21, sizeof(ubo21), 0);
 
 		ubo22.amb = ambIntensity; ubo22.gamma = 180.0f; ubo22.sColor = glm::vec3(1.0f);
 		ubo22.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, 0, -2.1));
 		ubo22.mvpMat = ViewPrj * Rotations[22][a] * Rotations[22][b] * Rotations[22][c] * ubo22.mMat;
-		DS22.map(currentImage, &ubo22, sizeof(ubo22), 0);
+		descriptorSets[21].map(currentImage, &ubo22, sizeof(ubo22), 0);
 
 		ubo23.amb = ambIntensity; ubo23.gamma = 180.0f; ubo23.sColor = glm::vec3(1.0f);
 		ubo23.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, 0, -2.1));
 		ubo23.mvpMat = ViewPrj * Rotations[23][a] * Rotations[23][b] * Rotations[23][c] * ubo23.mMat;
-		DS23.map(currentImage, &ubo23, sizeof(ubo23), 0);
+		descriptorSets[22].map(currentImage, &ubo23, sizeof(ubo23), 0);
 
 		// bottom back
 		ubo24.amb = ambIntensity; ubo24.gamma = 180.0f; ubo24.sColor = glm::vec3(1.0f);
 		ubo24.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(-2.1, -2.1, -2.1));
 		ubo24.mvpMat = ViewPrj * Rotations[24][a] * Rotations[24][b] * Rotations[24][c] * ubo24.mMat;
-		DS24.map(currentImage, &ubo24, sizeof(ubo24), 0);
+		descriptorSets[23].map(currentImage, &ubo24, sizeof(ubo24), 0);
 
 		ubo25.amb = ambIntensity; ubo25.gamma = 180.0f; ubo25.sColor = glm::vec3(1.0f);
 		ubo25.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(0, -2.1, -2.1));
 		ubo25.mvpMat = ViewPrj * Rotations[25][a] * Rotations[25][b] * Rotations[25][c] * ubo25.mMat;
-		DS25.map(currentImage, &ubo25, sizeof(ubo25), 0);
+		descriptorSets[24].map(currentImage, &ubo25, sizeof(ubo25), 0);
 
 		ubo26.amb = ambIntensity; ubo26.gamma = 180.0f; ubo26.sColor = glm::vec3(1.0f);
 		ubo26.mMat = glm::scale(glm::mat4(1), glm::vec3(0.2)) *
 			glm::translate(glm::mat4(1), glm::vec3(2.1, -2.1, -2.1));
 		ubo26.mvpMat = ViewPrj * Rotations[26][a] * Rotations[26][b] * Rotations[26][c] * ubo26.mMat;
-		DS26.map(currentImage, &ubo26, sizeof(ubo26), 0);
-		
-
+		descriptorSets[25].map(currentImage, &ubo26, sizeof(ubo26), 0);
 	}
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
 		std::cout << faceID;
