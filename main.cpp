@@ -839,14 +839,14 @@ protected:
 				cube[1][faceID % 3][2] = t;
 			}
 		}
-		else if (faceID < 9) {
+		else {
 			//rotation on x axis
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					Rotations[cube[j][i][faceID % 3]] =
 						glm::mat4(1, 0, 0, 0,
-							0, glm::cos(ang), glm::sin(ang), 0,
-							0, -glm::sin(ang), glm::cos(ang), 0,
+							0, glm::cos(-ang), glm::sin(-ang), 0,
+							0, -glm::sin(-ang), glm::cos(-ang), 0,
 							0, 0, 0, 1) * Rotations[cube[j][i][faceID % 3]];
 				}
 			}//logic model adjustment
@@ -874,9 +874,6 @@ protected:
 				cube[2][1][faceID % 3] = cube[1][2][faceID % 3];
 				cube[1][2][faceID % 3] = t;
 			}
-		}
-		else {
-
 		}
 		
 	}
