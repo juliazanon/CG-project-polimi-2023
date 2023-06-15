@@ -43,7 +43,7 @@ protected:
 
 	glm::mat4 Rotations[27];
 	glm::mat4 FinRotations[27];
-	int selFace = 0;
+	int faceID = 0;
 	int cube[3][3][3] = { {{0, 1, 2}, { 3, 4, 5}, { 6, 7, 8,}},
 			{{9, 10, 11}, { 12, 13, 14}, { 15, 16, 17,}},
 			{{18, 19, 20}, { 21, 22, 23}, { 24, 25, 26,}} };
@@ -461,25 +461,24 @@ protected:
 		txt.populateCommandBuffer(commandBuffer, currentImage);
 	}
 
+
+	const float rotSpeed = glm::radians(90.0f);
+	const float rotRange = glm::radians(90.0f);
+	float faceRot = 0.0f;
+	float totFaceRot = 0.0f;
+
+	bool rotating = false;
+	int dir = 0;
 	// Here is where you update the uniforms.
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
-		static auto startTime = std::chrono::high_resolution_clock::now();
-		static float lastTime = 0.0f;
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		float time = std::chrono::duration<float, std::chrono::seconds::period>
-			(currentTime - startTime).count();
-		float deltaT = time - lastTime;
-		lastTime = time;
-		const float rotSpeed = glm::radians(45.0f);
-
+		
 		static bool debounce = false;
 		static int curDebounce = 0;
 
 		static bool showNormal = false;
 		static bool showUV = false;
-		static bool rotateds = false;
-		static bool rotatedw = false;
+		static bool rotated = false;
 		static bool changed = false;
 
 		
@@ -510,38 +509,91 @@ protected:
 				curDebounce = 0;
 			}
 		}
-		
 
-		if (glfwGetKey(window, GLFW_KEY_S)) {
-			if (rotateds == false) {
-				rotateds = true;
-				rotateFace(cube, selFace, -1);
-			}
-			else {
+		int ts = glfwGetKey(window, GLFW_KEY_S);
+		int tw = glfwGetKey(window, GLFW_KEY_W);
+
+		// Integration with the timers and the controllers
+		float deltaT;
+		bool fire;
+		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
+		getSixAxis(deltaT, m, r, fire);
+
+		if (ts+tw) {
+			if (rotated == false && rotating == false) {
+				rotated = true;
+				rotating = true;
+				std::cout << rotating << " ";
+				dir = ts * (-1) + tw;
+				rotateFace(cube, faceID, dir);
 			}
 		}
 		else {
-			rotateds = false;
+			rotated = false;
 		}
-		if (glfwGetKey(window, GLFW_KEY_W)) {
-			if (rotatedw == false) {
-				rotatedw = true;
-				rotateFace(cube, selFace, 1);
+
+		float ang = glm::radians(90.0f);
+		
+		if (rotating == true) {
+
+			faceRot = rotSpeed * deltaT;
+			totFaceRot += rotSpeed * deltaT;
+
+			if (faceID < 3) {
+				//rotation on z axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						//cube rotation through rotation matrix
+						Rotations[cube[faceID][i][j]] =
+							glm::mat4(glm::cos(dir*faceRot), glm::sin(dir * faceRot), 0, 0,
+								-glm::sin(dir * faceRot), glm::cos(dir * faceRot), 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1) * Rotations[cube[faceID][i][j]];
+					}
+				}
+			}
+
+			else if (faceID < 6) {
+				//rotation on y axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						Rotations[cube[j][faceID % 3][i]] =
+							glm::mat4(glm::cos(dir * faceRot), 0, glm::sin(dir * faceRot), 0,
+								0, 1, 0, 0,
+								-glm::sin(dir * faceRot), 0, glm::cos(dir * faceRot), 0,
+								0, 0, 0, 1) * Rotations[cube[j][faceID % 3][i]];
+					}
+				}
 			}
 			else {
+				//rotation on x axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						Rotations[cube[j][i][faceID % 3]] =
+							glm::mat4(1, 0, 0, 0,
+								0, glm::cos(-(dir * faceRot)), glm::sin(-(dir * faceRot)), 0,
+								0, -glm::sin(-(dir * faceRot)), glm::cos(-(dir * faceRot)), 0,
+								0, 0, 0, 1) * Rotations[cube[j][i][faceID % 3]];
+					}
+				}
 			}
 		}
 		else {
-			rotatedw = false;
+		}
+		if (rotating == true && totFaceRot > ang) {
+			rotating = false;
+			std::cout << rotating << " ";
+			faceRot = 0.0f;
+			totFaceRot = 0.0f;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE)) {
-			if (changed == false) {
+			if (changed == false && rotating == false) {
 				changed = true;
-				selFace++;
-				selFace = selFace % 9;
+				faceID++;
+				faceID = faceID % 9;
 
-				std::cout << selFace;
+				std::cout << faceID;
 			}
 			else {
 			}
@@ -559,8 +611,10 @@ protected:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
+		
+
 		// update camera
-		GameLogic();
+		GameLogic(deltaT, m, r, fire);
 										
 		// Here is where you actually update your uniforms
 
@@ -749,33 +803,13 @@ protected:
 		
 
 	}
-	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
-		std::cout << faceID;
-		float ang = dir * glm::radians(90.0f);
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 3; k++) {
-					std::cout << "/" << cube[i][j][k] << "/";
 
-				}
-				std::cout << " ";
-			}
-			std::cout << '\n';
-		}
+
+	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
+		float ang = dir * glm::radians(90.0f);
 		if (faceID < 3) {
 			//rotation on z axis
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					
-					//cube rotation through rotation matrix
-					Rotations[cube[faceID][i][j]] =
-						 glm::mat4(glm::cos(ang), glm::sin(ang), 0, 0,
-							-glm::sin(ang), glm::cos(ang), 0, 0,
-							0, 0, 1, 0,
-							0, 0, 0, 1) * Rotations[cube[faceID][i][j]];
-
-				}
-			}
+			
 			//logic model adjustment
 			if (dir == 1) {
 				int t = cube[faceID % 3][0][0];
@@ -805,15 +839,7 @@ protected:
 
 		else if (faceID < 6) {
 			//rotation on y axis
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					Rotations[cube[j][faceID % 3][i]] =
-						glm::mat4(glm::cos(ang), 0, glm::sin(ang), 0,
-							0, 1, 0, 0,
-							-glm::sin(ang), 0, glm::cos(ang), 0,
-							0, 0, 0, 1) * Rotations[cube[j][faceID % 3][i]];
-				}
-			}//logic model adjustment
+			//logic model adjustment
 			if (dir == 1) {
 				int t = cube[0][faceID % 3][0];
 				cube[0][faceID % 3][0] = cube[0][faceID % 3][2];
@@ -841,15 +867,7 @@ protected:
 		}
 		else {
 			//rotation on x axis
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					Rotations[cube[j][i][faceID % 3]] =
-						glm::mat4(1, 0, 0, 0,
-							0, glm::cos(-ang), glm::sin(-ang), 0,
-							0, -glm::sin(-ang), glm::cos(-ang), 0,
-							0, 0, 0, 1) * Rotations[cube[j][i][faceID % 3]];
-				}
-			}//logic model adjustment
+			//logic model adjustment
 			if (dir == 1) {
 				int t = cube[0][0][faceID % 3];
 				cube[0][0][faceID % 3] = cube[0][2][faceID % 3];
@@ -878,7 +896,7 @@ protected:
 		
 	}
 
-	void GameLogic() {
+	void GameLogic(float deltaT, glm::vec3 m, glm::vec3 r, bool fire) {
 		// Parameters
 		// Camera FOV-y, Near Plane and Far Plane
 		const float FOVy = glm::radians(45.0f);
@@ -890,11 +908,7 @@ protected:
 		// Rotation and motion speed
 		const float ROT_SPEED = glm::radians(120.0f);
 
-		// Integration with the timers and the controllers
-		float deltaT;
-		bool fire;
-		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
-		getSixAxis(deltaT, m, r, fire);
+		
 
 		// Game Logic implementation
 		ViewPrj = glm::mat4(1);
