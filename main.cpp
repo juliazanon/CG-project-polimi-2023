@@ -462,12 +462,19 @@ protected:
 	}
 
 
-	const float rotSpeed = glm::radians(90.0f);
+	float rotSpeed = glm::radians(90.0f);
 	const float rotRange = glm::radians(90.0f);
 	float faceRot = 0.0f;
 	float totFaceRot = 0.0f;
 
+	int totShuff = 0;
+	int currShuff = 0;
+
+	int ts = 0;
+	int tw = 0;
+
 	bool rotating = false;
+	bool shuffling = false;
 	int dir = 0;
 	// Here is where you update the uniforms.
 	// Very likely this will be where you will be writing the logic of your application.
@@ -510,8 +517,11 @@ protected:
 			}
 		}
 
-		int ts = glfwGetKey(window, GLFW_KEY_S);
-		int tw = glfwGetKey(window, GLFW_KEY_W);
+		if (currShuff == 0 && totShuff == 0) {
+			ts = glfwGetKey(window, GLFW_KEY_S);
+			tw = glfwGetKey(window, GLFW_KEY_W);
+		}
+		
 
 		// Integration with the timers and the controllers
 		float deltaT;
@@ -523,7 +533,6 @@ protected:
 			if (rotated == false && rotating == false) {
 				rotated = true;
 				rotating = true;
-				std::cout << rotating << " ";
 				dir = ts * (-1) + tw;
 				rotateFace(cube, faceID, dir);
 			}
@@ -580,15 +589,16 @@ protected:
 		}
 		else {
 		}
+
 		if (rotating == true && totFaceRot > ang) {
 			rotating = false;
-			std::cout << rotating << " ";
+
 			faceRot = 0.0f;
 			totFaceRot = 0.0f;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE)) {
-			if (changed == false && rotating == false) {
+			if (changed == false && rotating == false && shuffling == false) {
 				changed = true;
 				faceID++;
 				faceID = faceID % 9;
@@ -601,6 +611,50 @@ protected:
 		else {
 			changed = false;
 		}
+
+		if (glfwGetKey(window, GLFW_KEY_L)) {
+			if (shuffling == false ){
+				if (rotating == false) {
+					shuffling = true;
+				}
+			}else {
+			}
+		}
+		else{
+			if (shuffling == true) {
+				totShuff = rand() % 20 + 20;
+				rotSpeed = glm::radians(270.0f);
+			}
+			shuffling = false;
+		}
+
+		if (rotating == false && rotated == false) {
+			if (currShuff < totShuff) {
+				currShuff++;
+				int temp = rand() % 2 * 2 - 1;
+				faceID = rand() % 9;
+				if (temp == -1) {
+					ts = 1;
+					tw = 0;
+				}
+				else {
+					ts = 0;
+					tw = 1;
+				}
+				std::cout << ts << " " << tw;
+			}
+			else if (currShuff == totShuff && totShuff != 0) {
+				rotSpeed = glm::radians(90.0f);
+				faceID = 0;
+				currShuff = 0;
+				totShuff = 0;
+			}
+		}
+		else {
+			ts = 0;
+			tw = 0;
+		}
+
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 			glfwSetWindowShouldClose(window, GL_TRUE);
