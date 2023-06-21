@@ -476,6 +476,11 @@ protected:
 	bool rotating = false;
 	bool shuffling = false;
 	int dir = 0;
+
+	//create temporary variables for the rotation matrices at the beginning of the rotation
+		//to be used when setting the correct deltaT independent rotation
+	glm::mat4 startRot[3][3];
+
 	// Here is where you update the uniforms.
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
@@ -529,20 +534,104 @@ protected:
 		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
 		getSixAxis(deltaT, m, r, fire);
 
+		
+
 		if (ts+tw) {
 			if (rotated == false && rotating == false) {
+				std::cout << "update";
 				rotated = true;
 				rotating = true;
 				dir = ts * (-1) + tw;
 				rotateFace(cube, faceID, dir);
+				
+
+				if (faceID < 3) {
+					//rotation on z axis
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							//cube rotation through rotation matrix
+							startRot[i][j] = Rotations[cube[faceID][i][j]];
+						}
+					}
+					std::cout << '\n' << Rotations[cube[faceID][0][0]][0][0] << '\n' << startRot[0][0][0][0];
+				}
+				else if (faceID < 6) {
+					//rotation on y axis
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							startRot[i][j] = Rotations[cube[j][faceID % 3][i]];
+						}
+					}
+				}
+				else {
+					//rotation on x axis
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							startRot[i][j] = Rotations[cube[j][i][faceID % 3]];
+						}
+					}
+				}
+
 			}
 		}
 		else {
 			rotated = false;
 		}
 
+
+
 		float ang = glm::radians(90.0f);
 		
+		//ending rotation
+		if (rotating == true && totFaceRot >= ang) {
+			rotating = false;
+
+			faceRot = 0.0f;
+			totFaceRot = 0.0f;
+
+			//set face position to the correct one, independent from deltaT at the end of the rotation
+
+			if (faceID < 3) {
+				//rotation on z axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						//cube rotation through rotation matrix
+						Rotations[cube[faceID][i][j]] =
+							glm::mat4(glm::cos(dir * ang), glm::sin(dir * ang), 0, 0,
+								-glm::sin(dir * ang), glm::cos(dir * ang), 0, 0,
+								0, 0, 1, 0,
+								0, 0, 0, 1) * 
+							startRot[i][j];
+					}
+				}
+			}
+
+			else if (faceID < 6) {
+				//rotation on y axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						Rotations[cube[j][faceID % 3][i]] =
+							glm::mat4(glm::cos(dir * ang), 0, glm::sin(dir * ang), 0,
+								0, 1, 0, 0,
+								-glm::sin(dir * ang), 0, glm::cos(dir * ang), 0,
+								0, 0, 0, 1) * startRot[i][j];
+					}
+				}
+			}
+			else {
+				//rotation on x axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						Rotations[cube[j][i][faceID % 3]] =
+							glm::mat4(1, 0, 0, 0,
+								0, glm::cos(-(dir * ang)), glm::sin(-(dir * ang)), 0,
+								0, -glm::sin(-(dir * ang)), glm::cos(-(dir * ang)), 0,
+								0, 0, 0, 1) * startRot[i][j];
+					}
+				}
+			}
+		}
+
 		if (rotating == true) {
 
 			faceRot = rotSpeed * deltaT;
@@ -552,14 +641,16 @@ protected:
 				//rotation on z axis
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 3; j++) {
+
 						//cube rotation through rotation matrix
 						Rotations[cube[faceID][i][j]] =
 							glm::mat4(glm::cos(dir*faceRot), glm::sin(dir * faceRot), 0, 0,
 								-glm::sin(dir * faceRot), glm::cos(dir * faceRot), 0, 0,
 								0, 0, 1, 0,
-								0, 0, 0, 1) * Rotations[cube[faceID][i][j]];
+								0, 0, 0, 1) * Rotations[cube[faceID][i][j]];	
 					}
 				}
+				std::cout << '\n' << Rotations[cube[faceID][0][0]][0][0] << '\n'<< "rot" << startRot[0][0][0][0];
 			}
 
 			else if (faceID < 6) {
@@ -590,12 +681,6 @@ protected:
 		else {
 		}
 
-		if (rotating == true && totFaceRot > ang) {
-			rotating = false;
-
-			faceRot = 0.0f;
-			totFaceRot = 0.0f;
-		}
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE)) {
 			if (changed == false && rotating == false && shuffling == false) {
@@ -623,7 +708,7 @@ protected:
 		else{
 			if (shuffling == true) {
 				totShuff = rand() % 20 + 20;
-				rotSpeed = glm::radians(270.0f);
+				rotSpeed = glm::radians(450.0f);
 			}
 			shuffling = false;
 		}
