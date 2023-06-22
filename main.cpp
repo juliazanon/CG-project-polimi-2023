@@ -61,7 +61,8 @@ protected:
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13, 
 		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26,
 		DSGubo;
-	Texture T1, T2;
+	Texture T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T17, T18,
+		T19, T20, T21, T22, T23, T24, T25, T26;
 
 	MeshUniformBlock ubo1, ubo2, ubo3, ubo4, ubo5, ubo6, ubo7, ubo8, ubo9, ubo10, ubo11, ubo12,
 		ubo13, ubo14, ubo15, ubo16, ubo17, ubo18, ubo19, ubo20, ubo21, ubo22, ubo23, ubo24, ubo25, ubo26;
@@ -145,9 +146,10 @@ protected:
  								    VK_CULL_MODE_NONE, false);*/
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
-		Cube.init(this, &VD, "Models/Cube.obj", OBJ);
+		createCubeMesh(Cube.vertices, Cube.indices);
+		Cube.initMesh(this, &VD);
 
-		T1.init(this, "textures/Checker.png");
+		T1.init(this, "textures/teste2.png");
 		
 		txt.init(this, &demoText);
 	}
@@ -479,50 +481,16 @@ protected:
 	// Here is where you update the uniforms.
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
-		
-		static bool debounce = false;
-		static int curDebounce = 0;
-
 		static bool showNormal = false;
 		static bool showUV = false;
 		static bool rotated = false;
 		static bool changed = false;
-
-		
-		if(glfwGetKey(window, GLFW_KEY_N)) {
-			if(!debounce) {
-				debounce = true;
-				curDebounce = GLFW_KEY_N;
-				showNormal = !showNormal;
-				showUV = false;
-			}
-		} else {
-			if((curDebounce == GLFW_KEY_N) && debounce) {
-				debounce = false;
-				curDebounce = 0;
-			}
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_U)) {
-			if(!debounce) {
-				debounce = true;
-				curDebounce = GLFW_KEY_U;
-				showNormal = false;
-				showUV = !showUV;
-			}
-		} else {
-			if((curDebounce == GLFW_KEY_U) && debounce) {
-				debounce = false;
-				curDebounce = 0;
-			}
-		}
 
 		if (currShuff == 0 && totShuff == 0) {
 			ts = glfwGetKey(window, GLFW_KEY_S);
 			tw = glfwGetKey(window, GLFW_KEY_W);
 		}
 		
-
 		// Integration with the timers and the controllers
 		float deltaT;
 		bool fire;
@@ -992,6 +960,61 @@ protected:
 		Mp[1][1] *= -1;
 
 		ViewPrj = Mp * Mv;
+
+	}
+
+	void createCubeMesh(std::vector<Vertex>& vDef, std::vector<uint32_t>& vIdx) {
+		// front
+		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.444f} });// vertex 0 - Position and Normal
+		vDef.push_back({ {1.0f, -1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.333f, 0.444f} });// vertex 1 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f} });// vertex 2 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.333f, 0.0f} });// vertex 3 - Position and Normal
+
+		// right
+		vDef.push_back({ {1.0f, -1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f} });// vertex 1/4 - Position and Normal
+		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {0.333f, 1.0f} });// vertex 5/5 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.555f} });// vertex 3/6 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {0.333f, 0.555f} });// vertex 7/7 - Position and Normal
+
+		// back
+		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.333f, 1.0f} });// vertex 5/8 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.667f, 1.0f} });// vertex 4/9 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.333f, 0.555f} });// vertex 7/10 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.667f, 0.555f} });// vertex 6/11 - Position and Normal
+
+		// left
+		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.333f, 0.444f} });// vertex 4/12 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.667f, 0.444f} });// vertex 0/13 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.333f, 0.0f} });// vertex 6/14 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.667f, 0.0f} });// vertex 2/15 - Position and Normal
+
+		// down
+		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.667f, 1.0f} });// vertex 0/16 - Position and Normal
+		vDef.push_back({ {1.0f, -1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f} });// vertex 1/17 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {0.667f, 0.555f} });// vertex 4/18 - Position and Normal
+		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.555f} });// vertex 5/19 - Position and Normal
+
+		// up
+		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.444f} });// vertex 2/20 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.444f} });// vertex 3/21 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.0f} });// vertex 6/22 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.444f} });// vertex 3/23 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.0f} });// vertex 6/24 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f} });// vertex 7/25 - Position and Normal
+
+		// Fill the array vIdx with the indices of the vertices of the triangles
+		vIdx.push_back(0); vIdx.push_back(1); vIdx.push_back(2);
+		vIdx.push_back(1); vIdx.push_back(2); vIdx.push_back(3);
+		vIdx.push_back(4); vIdx.push_back(5); vIdx.push_back(6);
+		vIdx.push_back(5); vIdx.push_back(6); vIdx.push_back(7);
+		vIdx.push_back(8); vIdx.push_back(9); vIdx.push_back(10);
+		vIdx.push_back(9); vIdx.push_back(10); vIdx.push_back(11);
+		vIdx.push_back(12); vIdx.push_back(13); vIdx.push_back(14);
+		vIdx.push_back(13); vIdx.push_back(14); vIdx.push_back(15);
+		vIdx.push_back(16); vIdx.push_back(17); vIdx.push_back(18);
+		vIdx.push_back(17); vIdx.push_back(18); vIdx.push_back(19);
+		vIdx.push_back(20); vIdx.push_back(21); vIdx.push_back(22);
+		vIdx.push_back(23); vIdx.push_back(24); vIdx.push_back(25);
 	}
 
 	glm::mat4 MakeWorldMatrix(glm::vec3 pos, glm::quat rQ, glm::vec3 size) {
