@@ -61,7 +61,7 @@ protected:
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13, 
 		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26,
 		DSGubo;
-	Texture T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T17, T18,
+	Texture T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18,
 		T19, T20, T21, T22, T23, T24, T25, T26;
 
 	MeshUniformBlock ubo1, ubo2, ubo3, ubo4, ubo5, ubo6, ubo7, ubo8, ubo9, ubo10, ubo11, ubo12,
@@ -142,14 +142,39 @@ protected:
 		// The last array, is a vector of pointer to the layouts of the sets that will
 		// be used in this pipeline. The first element will be set 0, and so on..
 		P1.init(this, &VD, "shaders/ShaderVert.spv", "shaders/ShaderFrag.spv", {&DSLGubo, &DSL});
-		/*P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
- 								    VK_CULL_MODE_NONE, false);*/
+		P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
+ 								    VK_CULL_MODE_NONE, false);
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		createCubeMesh(Cube.vertices, Cube.indices);
 		Cube.initMesh(this, &VD);
 
-		T1.init(this, "textures/teste2.png");
+		T1.init(this, "textures/cube1.png");
+		T2.init(this, "textures/cube2.png");
+		T3.init(this, "textures/cube3.png");
+		T4.init(this, "textures/cube4.png");
+		T5.init(this, "textures/cube5.png");
+		T6.init(this, "textures/cube6.png");
+		T7.init(this, "textures/cube7.png");
+		T8.init(this, "textures/cube8.png");
+		T9.init(this, "textures/cube9.png");
+		T10.init(this, "textures/cube10.png");
+		T11.init(this, "textures/cube11.png");
+		T12.init(this, "textures/cube12.png");
+		T13.init(this, "textures/cube13.png");
+		T14.init(this, "textures/cube14.png");
+		T15.init(this, "textures/cube15.png");
+		T16.init(this, "textures/cube16.png");
+		T17.init(this, "textures/cube17.png");
+		T18.init(this, "textures/cube18.png");
+		T19.init(this, "textures/cube19.png");
+		T20.init(this, "textures/cube20.png");
+		T21.init(this, "textures/cube21.png");
+		T22.init(this, "textures/cube22.png");
+		T23.init(this, "textures/cube23.png");
+		T24.init(this, "textures/cube24.png");
+		T25.init(this, "textures/cube25.png");
+		T26.init(this, "textures/cube26.png");
 		
 		txt.init(this, &demoText);
 	}
@@ -166,127 +191,127 @@ protected:
 
 		DS2.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T2}
 				});
 
 		DS3.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T3}
 			});
 
 		DS4.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T4}
 			});
 
 		DS5.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T5}
 			});
 
 		DS6.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T6}
 			});
 
 		DS7.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T7}
 			});
 
 		DS8.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T8}
 			});
 
 		DS9.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T9}
 			});
 
 		DS10.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T10}
 			});
 
 		DS11.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T11}
 			});
 
 		DS12.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T12}
 			});
 
 		DS13.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T13}
 			});
 
 		DS14.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T14}
 			});
 
 		DS15.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T15}
 			});
 
 		DS16.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T16}
 			});
 
 		DS17.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T17}
 			});
 
 		DS18.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T18}
 			});
 
 		DS19.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T19}
 			});
 
 		DS20.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T20}
 			});
 
 		DS21.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T21}
 			});
 
 		DS22.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T22}
 			});
 
 		DS23.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T23}
 			});
 
 		DS24.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T24}
 			});
 
 		DS25.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T25}
 			});
 
 		DS26.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &T26}
 			});
 
 		DSGubo.init(this, &DSLGubo, {
@@ -336,6 +361,31 @@ protected:
 	// You also have to destroy the pipelines
 	void localCleanup() {
 		T1.cleanup();
+		T2.cleanup();
+		T3.cleanup();
+		T4.cleanup();
+		T5.cleanup();
+		T6.cleanup();
+		T7.cleanup();
+		T8.cleanup();
+		T9.cleanup();
+		T10.cleanup();
+		T11.cleanup();
+		T12.cleanup();
+		T13.cleanup();
+		T14.cleanup();
+		T15.cleanup();
+		T16.cleanup();
+		T17.cleanup();
+		T18.cleanup();
+		T19.cleanup();
+		T20.cleanup();
+		T21.cleanup();
+		T22.cleanup();
+		T23.cleanup();
+		T24.cleanup();
+		T25.cleanup();
+		T26.cleanup();
 
 		Cube.cleanup();
 
@@ -998,9 +1048,7 @@ protected:
 		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.444f} });// vertex 2/20 - Position and Normal
 		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.444f} });// vertex 3/21 - Position and Normal
 		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.0f} });// vertex 6/22 - Position and Normal
-		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.444f} });// vertex 3/23 - Position and Normal
-		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.0f} });// vertex 6/24 - Position and Normal
-		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f} });// vertex 7/25 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f} });// vertex 7/23 - Position and Normal
 
 		// Fill the array vIdx with the indices of the vertices of the triangles
 		vIdx.push_back(0); vIdx.push_back(1); vIdx.push_back(2);
@@ -1014,7 +1062,7 @@ protected:
 		vIdx.push_back(16); vIdx.push_back(17); vIdx.push_back(18);
 		vIdx.push_back(17); vIdx.push_back(18); vIdx.push_back(19);
 		vIdx.push_back(20); vIdx.push_back(21); vIdx.push_back(22);
-		vIdx.push_back(23); vIdx.push_back(24); vIdx.push_back(25);
+		vIdx.push_back(21); vIdx.push_back(22); vIdx.push_back(23);
 	}
 
 	glm::mat4 MakeWorldMatrix(glm::vec3 pos, glm::quat rQ, glm::vec3 size) {
