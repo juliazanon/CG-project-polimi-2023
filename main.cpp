@@ -63,13 +63,16 @@ protected:
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	Model<Vertex> Cube;
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13,
-		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26;
+		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26,
+		DSBackground;
 
 	Texture T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18,
-		T19, T20, T21, T22, T23, T24, T25, T26;
+		T19, T20, T21, T22, T23, T24, T25, T26,
+		TBackground;
 
 	MeshUniformBlock ubo1, ubo2, ubo3, ubo4, ubo5, ubo6, ubo7, ubo8, ubo9, ubo10, ubo11, ubo12,
-		ubo13, ubo14, ubo15, ubo16, ubo17, ubo18, ubo19, ubo20, ubo21, ubo22, ubo23, ubo24, ubo25, ubo26;
+		ubo13, ubo14, ubo15, ubo16, ubo17, ubo18, ubo19, ubo20, ubo21, ubo22, ubo23, ubo24, ubo25, ubo26,
+		uboBackground;
 
 	TextMaker txt;
 	
@@ -92,9 +95,9 @@ protected:
 		initialBackgroundColor = {0.0f, 0.015f, 0.03f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 1000;
-		texturesInPool = 1000;
-		setsInPool = 1000;
+		uniformBlocksInPool = 500;
+		texturesInPool = 30;
+		setsInPool = 30;
 		
 		Ar = 4.0f / 3.0f;
 	}
@@ -111,10 +114,8 @@ protected:
 		// Descriptor Layouts [what will be passed to the shaders]
 
 		for (int i = 0; i < 27; i++) {
-			//for (int j = 0; j < 3; j++) {
-				Rotations[i] = glm::mat4(1);
-				FinRotations[i] = glm::mat4(1);
-			//}
+			Rotations[i] = glm::mat4(1);
+			FinRotations[i] = glm::mat4(1);
 		};
 
 		DSL.init(this, {
@@ -184,6 +185,8 @@ protected:
 		T24.init(this, "textures/cube24.png");
 		T25.init(this, "textures/cube25.png");
 		T26.init(this, "textures/cube26.png");
+
+		TBackground.init(this, "textures/background.png");
 		
 		txt.init(this, &demoText);
 	}
@@ -351,6 +354,12 @@ protected:
 					{2, UNIFORM, sizeof(GlobalUniformBlock), nullptr}
 			});
 
+		DSBackground.init(this, &DSL, {
+					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
+					{1, TEXTURE, 0, &TBackground},
+					{2, UNIFORM, sizeof(GlobalUniformBlock), nullptr}
+			});
+
 		txt.pipelinesAndDescriptorSetsInit();
 	}
 
@@ -386,6 +395,8 @@ protected:
 		DS24.cleanup();
 		DS25.cleanup();
 		DS26.cleanup();
+
+		DSBackground.cleanup();
 
 		txt.pipelinesAndDescriptorSetsCleanup();
 	}
@@ -546,9 +557,12 @@ protected:
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
+		DSBackground.bind(commandBuffer, P3, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+			static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
+
 		txt.populateCommandBuffer(commandBuffer, currentImage);
 	}
-
 
 	float rotSpeed = glm::radians(90.0f);
 	const float rotRange = glm::radians(90.0f);
@@ -989,6 +1003,12 @@ protected:
 		ubo26.mvpMat = ViewPrj * FinRotations[26] * ubo26.mMat;
 		DS26.map(currentImage, &ubo26, sizeof(ubo26), 0);
 		DS26.map(currentImage, &gubo, sizeof(gubo), 2);
+
+		uboBackground.mMat = glm::scale(glm::mat4(1), glm::vec3(10.0f)) *
+			glm::translate(glm::mat4(1), glm::vec3(0, 0, 0));
+		uboBackground.mvpMat = ViewPrj * uboBackground.mMat;
+		DSBackground.map(currentImage, &uboBackground, sizeof(uboBackground), 0);
+		DSBackground.map(currentImage, &gubo, sizeof(gubo), 2);
 	}
 
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
@@ -1140,27 +1160,27 @@ protected:
 		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {0.333f, 0.555f} });// vertex 7/7 - Position and Normal
 
 		// back
-		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.333f, 1.0f} });// vertex 5/8 - Position and Normal
-		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.667f, 1.0f} });// vertex 4/9 - Position and Normal
-		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.333f, 0.555f} });// vertex 7/10 - Position and Normal
-		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.667f, 0.555f} });// vertex 6/11 - Position and Normal
+		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.33333f, 1.0f} });// vertex 5/8 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.66667f, 1.0f} });// vertex 4/9 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.33333f, 0.55555f} });// vertex 7/10 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.66667f, 0.55555f} });// vertex 6/11 - Position and Normal
 
 		// left
-		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.333f, 0.444f} });// vertex 4/12 - Position and Normal
-		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.667f, 0.444f} });// vertex 0/13 - Position and Normal
-		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.333f, 0.0f} });// vertex 6/14 - Position and Normal
-		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.667f, 0.0f} });// vertex 2/15 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.33333f, 0.444f} });// vertex 4/12 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.66667f, 0.44444f} });// vertex 0/13 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.33333f, 0.0f} });// vertex 6/14 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.66667f, 0.0f} });// vertex 2/15 - Position and Normal
 
 		// down
-		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.667f, 1.0f} });// vertex 0/16 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.66667f, 1.0f} });// vertex 0/16 - Position and Normal
 		vDef.push_back({ {1.0f, -1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f} });// vertex 1/17 - Position and Normal
-		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {0.667f, 0.555f} });// vertex 4/18 - Position and Normal
-		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.555f} });// vertex 5/19 - Position and Normal
+		vDef.push_back({ {-1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {0.66667f, 0.55555f} });// vertex 4/18 - Position and Normal
+		vDef.push_back({ {1.0f, -1.0f, -1.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.55555f} });// vertex 5/19 - Position and Normal
 
 		// up
-		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.444f} });// vertex 2/20 - Position and Normal
-		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.444f} });// vertex 3/21 - Position and Normal
-		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.667f, 0.0f} });// vertex 6/22 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.66667f, 0.44444f} });// vertex 2/20 - Position and Normal
+		vDef.push_back({ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.44444f} });// vertex 3/21 - Position and Normal
+		vDef.push_back({ {-1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.66667f, 0.0f} });// vertex 6/22 - Position and Normal
 		vDef.push_back({ {1.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f} });// vertex 7/23 - Position and Normal
 
 		// Fill the array vIdx with the indices of the vertices of the triangles
