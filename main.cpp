@@ -470,8 +470,16 @@ protected:
 	int totShuff = 0;
 	int currShuff = 0;
 
-	int ts = 0;
-	int tw = 0;
+	int tl = 0;
+	int tr = 0;
+	int td = 0;
+	int tu = 0;
+	int tf = 0;
+	int tb = 0;
+	int tab = 0;
+	int  *faces[6] = {&tl, &tr, &td, &tu, &tf, &tb};
+
+	int face = 0;
 
 	bool rotating = false;
 	bool shuffling = false;
@@ -490,7 +498,6 @@ protected:
 
 		static bool showNormal = false;
 		static bool showUV = false;
-		static bool rotated = false;
 		static bool changed = false;
 
 		
@@ -507,7 +514,7 @@ protected:
 				curDebounce = 0;
 			}
 		}
-
+		/*
 		if(glfwGetKey(window, GLFW_KEY_U)) {
 			if(!debounce) {
 				debounce = true;
@@ -521,12 +528,36 @@ protected:
 				curDebounce = 0;
 			}
 		}
+		*/
 
 		if (currShuff == 0 && totShuff == 0) {
-			ts = glfwGetKey(window, GLFW_KEY_S);
-			tw = glfwGetKey(window, GLFW_KEY_W);
+			tl = glfwGetKey(window, GLFW_KEY_L);
+			tr = glfwGetKey(window, GLFW_KEY_R);
+			tu = glfwGetKey(window, GLFW_KEY_U);
+			td = glfwGetKey(window, GLFW_KEY_D);
+			tf = glfwGetKey(window, GLFW_KEY_F);
+			tb = glfwGetKey(window, GLFW_KEY_B);
+			tab = glfwGetKey(window, GLFW_KEY_TAB);
 		}
-		
+
+		if (tl + tr + tu + td + tf + tb) {
+			if (changed == false && rotating == false) {
+				changed = true;
+				if (tf) faceID = 0;
+				if (tb) faceID = 2;
+				if (tu) faceID = 3;
+				if (td) faceID = 5;
+				if (tr) faceID = 6;
+				if (tl) faceID = 8;
+				std::cout << "reset";
+			}
+			else {
+			}
+		}
+		else {
+			changed = false;
+		}
+
 
 		// Integration with the timers and the controllers
 		float deltaT;
@@ -536,12 +567,12 @@ protected:
 
 		
 
-		if (ts+tw) {
-			if (rotated == false && rotating == false) {
-				std::cout << "update";
-				rotated = true;
+		if (tl+tr+tu+td+tf+tb) {
+
+			if (rotating == false) {
+
 				rotating = true;
-				dir = ts * (-1) + tw;
+				dir = 2 * tab - 1;
 				rotateFace(cube, faceID, dir);
 				
 
@@ -553,7 +584,7 @@ protected:
 							startRot[i][j] = Rotations[cube[faceID][i][j]];
 						}
 					}
-					std::cout << '\n' << Rotations[cube[faceID][0][0]][0][0] << '\n' << startRot[0][0][0][0];
+					
 				}
 				else if (faceID < 6) {
 					//rotation on y axis
@@ -575,7 +606,6 @@ protected:
 			}
 		}
 		else {
-			rotated = false;
 		}
 
 
@@ -650,7 +680,7 @@ protected:
 								0, 0, 0, 1) * Rotations[cube[faceID][i][j]];	
 					}
 				}
-				std::cout << '\n' << Rotations[cube[faceID][0][0]][0][0] << '\n'<< "rot" << startRot[0][0][0][0];
+				
 			}
 
 			else if (faceID < 6) {
@@ -681,63 +711,39 @@ protected:
 		else {
 		}
 
-
-		if (glfwGetKey(window, GLFW_KEY_SPACE)) {
-			if (changed == false && rotating == false && shuffling == false) {
-				changed = true;
-				faceID++;
-				faceID = faceID % 9;
-
-				std::cout << faceID;
-			}
-			else {
-			}
-		}
-		else {
-			changed = false;
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_L)) {
-			if (shuffling == false ){
-				if (rotating == false) {
-					shuffling = true;
-				}
-			}else {
+		if (glfwGetKey(window, GLFW_KEY_S)) {
+			if (shuffling == false && rotating == false){
+				shuffling = true;
 			}
 		}
 		else{
 			if (shuffling == true) {
-				totShuff = rand() % 20 + 20;
+				totShuff = rand() % 20 + 10;
 				rotSpeed = glm::radians(450.0f);
 			}
-			shuffling = false;
-		}
 
-		if (rotating == false && rotated == false) {
+		}
+		if (rotating == false) {
 			if (currShuff < totShuff) {
 				currShuff++;
-				int temp = rand() % 2 * 2 - 1;
-				faceID = rand() % 9;
-				if (temp == -1) {
-					ts = 1;
-					tw = 0;
-				}
-				else {
-					ts = 0;
-					tw = 1;
-				}
-				std::cout << ts << " " << tw;
-			}
-			else if (currShuff == totShuff && totShuff != 0) {
+				*faces[face] = 0;
+				int tab = rand() % 2;
+				face = rand() % 6;
+				*faces[face] = 1;
+				if (tf) faceID = 0;
+				if (tb) faceID = 2;
+				if (tu) faceID = 3;
+				if (td) faceID = 5;
+				if (tr) faceID = 6;
+				if (tl) faceID = 8;
+			} else if (currShuff == totShuff && totShuff != 0) {
 				rotSpeed = glm::radians(90.0f);
-				faceID = 0;
 				currShuff = 0;
 				totShuff = 0;
+				shuffling = false;
 			}
 		}
 		else {
-			ts = 0;
-			tw = 0;
 		}
 
 
