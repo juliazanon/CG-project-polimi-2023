@@ -601,8 +601,8 @@ protected:
 				if (tb) faceID = 2;
 				if (tu) faceID = 3;
 				if (td) faceID = 5;
-				if (tr) faceID = 6;
-				if (tl) faceID = 8;
+				if (tr) faceID = 8;
+				if (tl) faceID = 6;
 				std::cout << "reset";
 			}
 			else {
@@ -625,8 +625,8 @@ protected:
 
 				rotating = true;
 				dir = 2 * tab - 1;
+				if (tr + tu + tb) dir = -dir;
 				rotateFace(cube, faceID, dir);
-				
 
 				if (faceID < 3) {
 					//rotation on z axis
