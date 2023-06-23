@@ -32,7 +32,13 @@ struct Vertex {
 
 class Rubiks;
 void GameLogic(Rubiks *A, float Ar, glm::mat4 &ViewPrj, glm::mat4 &World);
-//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+float scale = 0.2f;
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	scale += yoffset/100;
+	if (scale > 0.45f) scale = 0.45f;
+	if (scale < 0.05f) scale = 0.05f;
+}
 
 // MAIN ! 
 class Rubiks : public BaseProject {
@@ -48,7 +54,7 @@ protected:
 
 
 	// Descriptor Layouts [what will be passed to the shaders]
-	DescriptorSetLayout DSL, DSLGubo;
+	DescriptorSetLayout DSL;
 
 	// Pipelines [Shader couples]
 	VertexDescriptor VD;
@@ -58,6 +64,7 @@ protected:
 	Model<Vertex> Cube;
 	DescriptorSet DS1, DS2, DS3, DS4, DS5, DS6, DS7, DS8, DS9, DS10, DS11, DS12, DS13,
 		DS14, DS15, DS16, DS17, DS18, DS19, DS20, DS21, DS22, DS23, DS24, DS25, DS26;
+
 	Texture T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18,
 		T19, T20, T21, T22, T23, T24, T25, T26;
 
@@ -73,7 +80,7 @@ protected:
 	glm::vec3 cameraPos;
 	float Yaw = glm::radians(30.0f);
 	float Pitch = glm::radians(22.5f);
-	float scale = 0.2f;
+	//float scale = 0.2f;
 
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -85,9 +92,9 @@ protected:
 		initialBackgroundColor = {0.0f, 0.015f, 0.03f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 35;
-		texturesInPool = 50;
-		setsInPool = 50;
+		uniformBlocksInPool = 1000;
+		texturesInPool = 1000;
+		setsInPool = 1000;
 		
 		Ar = 4.0f / 3.0f;
 	}
@@ -180,10 +187,6 @@ protected:
 		
 		txt.init(this, &demoText);
 	}
-
-	/*void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-
-	}*/
 	
 	// Here you create your pipelines and Descriptor Sets!
 	void pipelinesAndDescriptorSetsInit() {
@@ -584,9 +587,10 @@ protected:
 		bool fire;
 		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
 		getSixAxis(deltaT, m, r, fire);
+		glfwSetScrollCallback(window, scroll_callback);
 
-		//glfwSetScrollCallback(window, scroll_callback);
 
+		// Manage rotations
 		if (ts+tw) {
 			if (rotated == false && rotating == false) {
 				std::cout << "update";
@@ -792,7 +796,7 @@ protected:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
-		if(glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
@@ -800,15 +804,12 @@ protected:
 		GameLogic(deltaT, m, r, fire);
 										
 		// Here is where you actually update your uniforms
-
 		// updates global uniforms
 		GlobalUniformBlock gubo{};
 		gubo.DlightDir = glm::normalize(glm::vec3(1, 2, 3));
 		gubo.DlightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		gubo.AmbLightColor = glm::vec3(0.1f);
 		gubo.eyePos = cameraPos;
-
-		/*DSGubo.map(currentImage, &gubo, sizeof(gubo), 0);*/
 
 		static int a = 2;
 		static int b = 0;
@@ -985,7 +986,6 @@ protected:
 		DS26.map(currentImage, &ubo26, sizeof(ubo26), 0);
 		DS26.map(currentImage, &gubo, sizeof(gubo), 2);
 	}
-
 
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
 		float ang = dir * glm::radians(90.0f);
