@@ -52,7 +52,7 @@ protected:
 
 	// Pipelines [Shader couples]
 	VertexDescriptor VD;
-	Pipeline P1, P2;
+	Pipeline P1, P2, P3;
 
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	Model<Vertex> Cube;
@@ -135,13 +135,17 @@ protected:
 		// Pipelines [Shader couples]
 		// The last array, is a vector of pointer to the layouts of the sets that will
 		// be used in this pipeline. The first element will be set 0, and so on..
-		P1.init(this, &VD, "shaders/BlinnLambertVert.spv", "shaders/BlinnLambertFrag.spv", {&DSL});
+		P1.init(this, &VD, "shaders/Shader1Vert.spv", "shaders/Shader1Frag.spv", {&DSL});
 		P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
  								    VK_CULL_MODE_NONE, false);
 
-		/*P2.init(this, &VD, "shaders/ShaderVert.spv", "shaders/ShaderFrag.spv", { &DSLGubo, &DSL });
+		P2.init(this, &VD, "shaders/Shader2Vert.spv", "shaders/Shader2Frag.spv", {&DSL});
 		P2.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
-			VK_CULL_MODE_NONE, false);*/
+			VK_CULL_MODE_NONE, false);
+
+		P3.init(this, &VD, "shaders/Shader3Vert.spv", "shaders/Shader3Frag.spv", {&DSL});
+		P3.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
+			VK_CULL_MODE_NONE, false);
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		createCubeMesh(Cube.vertices, Cube.indices);
@@ -185,7 +189,8 @@ protected:
 	void pipelinesAndDescriptorSetsInit() {
 		// This creates a new pipeline (with the current surface), using its shaders
 		P1.create();
-		//P2.create();
+		P2.create();
+		P3.create();
 
 		DS1.init(this, &DSL, {
 					{0, UNIFORM, sizeof(MeshUniformBlock), nullptr},
@@ -349,7 +354,8 @@ protected:
 	// Here you destroy your pipelines and Descriptor Sets!
 	void pipelinesAndDescriptorSetsCleanup() {
 		P1.cleanup();
-		//P2.cleanup();
+		P2.cleanup();
+		P3.cleanup();
 		
 		DS1.cleanup();
 		DS2.cleanup();
@@ -416,7 +422,8 @@ protected:
 		DSL.cleanup();
 		
 		P1.destroy();
-		//P2.destroy();
+		P2.destroy();
+		P3.destroy();
 		
 		txt.localCleanup();
 	}
@@ -464,73 +471,75 @@ protected:
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		//P2.bind(commandBuffer);
+		P2.bind(commandBuffer);
 
-		DS10.bind(commandBuffer, P1, currentImage);
+		DS10.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS11.bind(commandBuffer, P1, currentImage);
+		DS11.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS12.bind(commandBuffer, P1, currentImage);
+		DS12.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS13.bind(commandBuffer, P1, currentImage);
+		DS13.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS14.bind(commandBuffer, P1, currentImage);
+		DS14.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS15.bind(commandBuffer, P1, currentImage);
+		DS15.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS16.bind(commandBuffer, P1, currentImage);
+		DS16.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS17.bind(commandBuffer, P1, currentImage);
+		DS17.bind(commandBuffer, P2, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS18.bind(commandBuffer, P1, currentImage);
+		P3.bind(commandBuffer);
+
+		DS18.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS19.bind(commandBuffer, P1, currentImage);
+		DS19.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS20.bind(commandBuffer, P1, currentImage);
+		DS20.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS21.bind(commandBuffer, P1, currentImage);
+		DS21.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS22.bind(commandBuffer, P1, currentImage);
+		DS22.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS23.bind(commandBuffer, P1, currentImage);
+		DS23.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS24.bind(commandBuffer, P1, currentImage);
+		DS24.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS25.bind(commandBuffer, P1, currentImage);
+		DS25.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
-		DS26.bind(commandBuffer, P1, currentImage);
+		DS26.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 

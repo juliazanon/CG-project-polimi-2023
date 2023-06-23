@@ -14,15 +14,6 @@ layout(binding = 2) uniform GlobalUniformBufferObject {
 	vec3 eyePos;		// position of the viewer
 } gubo;
 
-// layout(binding = 0) uniform UniformBufferObject {
-// 	float amb;
-// 	float gamma;
-// 	vec3 sColor;
-// 	mat4 mvpMat;
-// 	mat4 mMat;
-// 	mat4 nMat;
-// } ubo;
-
 layout(binding = 1) uniform sampler2D tex;
 
 void main() {
@@ -30,8 +21,7 @@ void main() {
 	vec3 V = normalize(gubo.eyePos - fragPos);	// viewer direction
 	vec3 L = normalize(gubo.DlightDir);			// light direction
 
-
-    float amb = 5.0f; 
+	float amb = 5.0f; 
 	vec3 albedo = texture(tex, fragUV).rgb;		// main color
 	vec3 MD = albedo;
 	vec3 MS = vec3(1.0f);
@@ -41,13 +31,9 @@ void main() {
 	
 	// Write the shader here
 	
-	vec3 h = normalize(L + V);
-	
-	vec3 specular = MS * pow(clamp(dot(N, h), 0.00001f, 1.0), gamma); // Blinn
-	vec3 diffuse = L * MD * max(dot(L, N), 0); // Lambert
-
-	vec3 DiffSpec = diffuse + specular;
-	vec3 Ambient = LA * MA;
-
-	outColor = vec4(clamp(0.95 * DiffSpec * gubo.DlightColor.rgb + Ambient, 0.00001f ,1.0f), 1.0f);	// output color
+	outColor = vec4(
+				clamp(MD * clamp(dot(L,N),0.0f,1.0f) +
+					  MS * pow(clamp(dot(N, normalize(L + V)), 0.0f, 1.0f), gamma) +
+					  LA * MA,
+				0.0f, 1.0f), 1.0f);	// output color
 }
