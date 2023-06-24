@@ -514,21 +514,6 @@ protected:
 				curDebounce = 0;
 			}
 		}
-		/*
-		if(glfwGetKey(window, GLFW_KEY_U)) {
-			if(!debounce) {
-				debounce = true;
-				curDebounce = GLFW_KEY_U;
-				showNormal = false;
-				showUV = !showUV;
-			}
-		} else {
-			if((curDebounce == GLFW_KEY_U) && debounce) {
-				debounce = false;
-				curDebounce = 0;
-			}
-		}
-		*/
 
 		if (currShuff == 0 && totShuff == 0) {
 			tl = glfwGetKey(window, GLFW_KEY_L);
