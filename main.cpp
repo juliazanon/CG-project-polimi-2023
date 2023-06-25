@@ -33,6 +33,7 @@ struct Vertex {
 class Rubiks;
 void GameLogic(Rubiks *A, float Ar, glm::mat4 &ViewPrj, glm::mat4 &World);
 
+// zoom
 float scale = 0.2f;
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	scale += yoffset/100;
@@ -45,7 +46,7 @@ class Rubiks : public BaseProject {
 protected:
 	// Here you list all the Vulkan objects you need:
 
-	glm::mat4 Rotations[27];
+	glm::mat4 Rotations[27]; // rotation matrices for each cube
 	glm::mat4 FinRotations[27];
 	int faceID = 0;
 	int cube[3][3][3] = { {{0, 1, 2}, { 3, 4, 5}, { 6, 7, 8,}},
@@ -836,8 +837,6 @@ protected:
 		static int b = 0;
 		static int c = 1;
 
-		float ambIntensity = 10.0f;
-
 		for (int i = 0; i < 27; i++) {
 			FinRotations[i] = Rotations[i];
 		}
@@ -1116,8 +1115,6 @@ protected:
 		const float camDist = 2; // radius
 		// Rotation and motion speed
 		const float ROT_SPEED = glm::radians(120.0f);
-
-		
 
 		// Game Logic implementation
 		ViewPrj = glm::mat4(1);
