@@ -77,14 +77,28 @@ protected:
 
 	TextMaker txt;
 	
-	// Other application parameters
+	//////////////////////////////////
+	/* Application parameters */
+	//////////////////////////////////
 	float Ar;
 	glm::mat4 ViewPrj;
 	glm::vec3 Pos = glm::vec3(0.0f,0.0f,0.0f);
 	glm::vec3 cameraPos;
 	float Yaw = glm::radians(30.0f);
 	float Pitch = glm::radians(22.5f);
-	//float scale = 0.2f;
+
+	float cubeRotSpeed = glm::radians(90.0f);
+	const float rotRange = glm::radians(90.0f);
+
+	// Camera parameters
+	const float FOVy = glm::radians(45.0f);
+	const float nearPlane = 0.1f;
+	const float farPlane = 100.f;
+	// Camera target height and distance
+	const float camHeight = 0;
+	const float camDist = 2; // radius
+	// Rotation and motion speed
+	const float ROT_SPEED = glm::radians(120.0f);
 
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -109,6 +123,9 @@ protected:
 		Ar = (float)w / (float)h;
 	}
 	
+	/////////////////////////////
+	/* Vulkan parameters setup */
+	/////////////////////////////
 	// Here you load and setup all your Vulkan Models and Texutures.
 	// Here you also create your Descriptor set layouts and load the shaders for the pipelines
 	void localInit() {
@@ -192,7 +209,9 @@ protected:
 		txt.init(this, &demoText);
 	}
 	
-	// Here you create your pipelines and Descriptor Sets!
+	/////////////////////////////////////////
+	/* Create pipelines and descriptor sets*/
+	/////////////////////////////////////////
 	void pipelinesAndDescriptorSetsInit() {
 		// This creates a new pipeline (with the current surface), using its shaders
 		P1.create();
@@ -364,6 +383,9 @@ protected:
 		txt.pipelinesAndDescriptorSetsInit();
 	}
 
+	//////////////
+	/* Cleanups */
+	//////////////
 	// Here you destroy your pipelines and Descriptor Sets!
 	void pipelinesAndDescriptorSetsCleanup() {
 		P1.cleanup();
@@ -445,10 +467,12 @@ protected:
 		txt.localCleanup();
 	}
 	
-	// Here it is the creation of the command buffer:
-	// You send to the GPU all the objects you want to draw,
-	// with their buffers and textures
+	///////////////////////////
+	/* Create command buffer */
+	///////////////////////////
+	// You send to the GPU all the objects you want to draw, with their buffers and textures
 	void populateCommandBuffer(VkCommandBuffer commandBuffer, int currentImage) {
+		// First row of cubes + background
 		P1.bind(commandBuffer);
 		Cube.bind(commandBuffer);
 
@@ -492,6 +516,7 @@ protected:
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
+		// Second row of cubes
 		P2.bind(commandBuffer);
 
 		DS10.bind(commandBuffer, P2, currentImage);
@@ -526,6 +551,7 @@ protected:
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
+		// Third row of cubes
 		P3.bind(commandBuffer);
 
 		DS18.bind(commandBuffer, P3, currentImage);
@@ -567,8 +593,9 @@ protected:
 		txt.populateCommandBuffer(commandBuffer, currentImage);
 	}
 
-	float rotSpeed = glm::radians(90.0f);
-	const float rotRange = glm::radians(90.0f);
+	///////////////////////////////
+	/* Local Rotation parameters */
+	///////////////////////////////
 	float faceRot = 0.0f;
 	float totFaceRot = 0.0f;
 
@@ -594,7 +621,9 @@ protected:
 		//to be used when setting the correct deltaT independent rotation
 	glm::mat4 startRot[3][3];
 
-	// Here is where you update the uniforms.
+	/////////////////////
+	/* Update uniforms */
+	/////////////////////
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
 		static bool showNormal = false;
@@ -611,19 +640,15 @@ protected:
 			tab = glfwGetKey(window, GLFW_KEY_TAB);
 		}
 
-		if (tl + tr + tu + td + tf + tb) {
-			if (changed == false && rotating == false) {
-				changed = true;
-				if (tf) faceID = 0;
-				if (tb) faceID = 2;
-				if (tu) faceID = 3;
-				if (td) faceID = 5;
-				if (tr) faceID = 8;
-				if (tl) faceID = 6;
-				std::cout << "reset";
-			}
-			else {
-			}
+		if (tl + tr + tu + td + tf + tb && changed == false && rotating == false) {
+			changed = true;
+			if (tf) faceID = 0;
+			if (tb) faceID = 2;
+			if (tu) faceID = 3;
+			if (td) faceID = 5;
+			if (tr) faceID = 8;
+			if (tl) faceID = 6;
+			//std::cout << "reset";
 		}
 		else {
 			changed = false;
@@ -634,7 +659,12 @@ protected:
 		bool fire;
 		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
 		getSixAxis(deltaT, m, r, fire);
-		glfwSetScrollCallback(window, scroll_callback);
+		glfwSetScrollCallback(window, scroll_callback); // zoom callback
+
+		// close window with escape
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+			glfwSetWindowShouldClose(window, GL_TRUE);
+		}
 
 		if (tl+tr+tu+td+tf+tb) {
 
@@ -731,8 +761,8 @@ protected:
 
 		if (rotating == true) {
 
-			faceRot = rotSpeed * deltaT;
-			totFaceRot += rotSpeed * deltaT;
+			faceRot = cubeRotSpeed * deltaT;
+			totFaceRot += cubeRotSpeed * deltaT;
 
 			if (faceID < 3) {
 				//rotation on z axis
@@ -786,7 +816,7 @@ protected:
 		else{
 			if (shuffling == true) {
 				totShuff = rand() % 20 + 10;
-				rotSpeed = glm::radians(450.0f);
+				cubeRotSpeed = glm::radians(450.0f);
 			}
 
 		}
@@ -804,21 +834,13 @@ protected:
 				if (tr) faceID = 6;
 				if (tl) faceID = 8;
 			} else if (currShuff == totShuff && totShuff != 0) {
-				rotSpeed = glm::radians(90.0f);
+				cubeRotSpeed = glm::radians(90.0f);
 				currShuff = 0;
 				totShuff = 0;
 				shuffling = false;
 			}
 		}
 		else {
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-			glfwSetWindowShouldClose(window, GL_TRUE);
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
 		// update camera
@@ -1013,6 +1035,9 @@ protected:
 		DSBackground.map(currentImage, &gubo, sizeof(gubo), 2);
 	}
 
+	////////////////////
+	/* 3D array logic */
+	////////////////////
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
 		float ang = dir * glm::radians(90.0f);
 		if (faceID < 3) {
@@ -1104,18 +1129,10 @@ protected:
 		
 	}
 
+	////////////
+	/* Camera */
+	////////////
 	void GameLogic(float deltaT, glm::vec3 m, glm::vec3 r, bool fire) {
-		// Parameters
-		// Camera FOV-y, Near Plane and Far Plane
-		const float FOVy = glm::radians(45.0f);
-		const float nearPlane = 0.1f;
-		const float farPlane = 100.f;
-		// Camera target height and distance
-		const float camHeight = 0;
-		const float camDist = 2; // radius
-		// Rotation and motion speed
-		const float ROT_SPEED = glm::radians(120.0f);
-
 		// Game Logic implementation
 		ViewPrj = glm::mat4(1);
 
@@ -1146,6 +1163,20 @@ protected:
 		ViewPrj = Mp * Mv;
 	}
 
+	glm::mat4 MakeWorldMatrix(glm::vec3 pos, glm::quat rQ, glm::vec3 size) {
+		// creates and returns a World Matrix that positions the object at <pos>,
+		// orients it according to <rQ>, and scales it according to the sizes
+		// given in vector <size>
+		glm::mat4 M =
+			glm::translate(glm::mat4(1.0), pos) *
+			glm::mat4(rQ);
+		glm::scale(glm::mat4(1.0), size);
+		return M;
+	}
+
+	///////////////////////////////////////////////
+	/* Generate cube with normals and uv mapping */
+	///////////////////////////////////////////////
 	void createCubeMesh(std::vector<Vertex>& vDef, std::vector<uint32_t>& vIdx) {
 		// front
 		vDef.push_back({ {-1.0f, -1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.444f} });// vertex 0 - Position and Normal
@@ -1196,17 +1227,6 @@ protected:
 		vIdx.push_back(17); vIdx.push_back(18); vIdx.push_back(19);
 		vIdx.push_back(20); vIdx.push_back(21); vIdx.push_back(22);
 		vIdx.push_back(21); vIdx.push_back(22); vIdx.push_back(23);
-	}
-
-	glm::mat4 MakeWorldMatrix(glm::vec3 pos, glm::quat rQ, glm::vec3 size) {
-		// creates and returns a World Matrix that positions the object at <pos>,
-		// orients it according to <rQ>, and scales it according to the sizes
-		// given in vector <size>
-		glm::mat4 M =
-			glm::translate(glm::mat4(1.0), pos) *
-			glm::mat4(rQ);
-		glm::scale(glm::mat4(1.0), size);
-		return M;
 	}
 };
 
