@@ -21,7 +21,7 @@ void main() {
 	vec3 V = normalize(gubo.eyePos - fragPos);	// viewer direction
 	vec3 L = normalize(gubo.DlightDir);			// light direction
 
-	float amb = 5.0f; 
+	float amb = 1.0f; 
 	vec3 albedo = texture(tex, fragUV).rgb;		// main color
 	vec3 MD = albedo;
 	vec3 MS = vec3(1.0f);
@@ -29,11 +29,15 @@ void main() {
 	vec3 LA = gubo.AmbLightColor;
     float gamma = 180.0f;
 	
-	// Write the shader here
+	// Phong Lambert shader
+
+	vec3 r = -reflect(L, N);
+
+	vec3 specular = MS * pow(clamp(dot(V, r), 0.00001f, 1.0f), gamma); // Phong
+	vec3 diffuse = L * MD * max(dot(L, N), 0); // Lambert
+
+	vec3 DiffSpec = diffuse + specular;
+	vec3 Ambient = LA * MA;
 	
-	outColor = vec4(
-				clamp(MD * clamp(dot(L,N),0.0f,1.0f) +
-					  MS * pow(clamp(dot(N, normalize(L + V)), 0.0f, 1.0f), gamma) +
-					  LA * MA,
-				0.0f, 1.0f), 1.0f);	// output color
+	outColor = vec4(clamp(0.95 * (DiffSpec) * gubo.DlightColor.rgb + Ambient, 0.00001f, 1.0f), 1.0f);
 }

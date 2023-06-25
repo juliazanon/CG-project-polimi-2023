@@ -95,7 +95,7 @@ protected:
 		initialBackgroundColor = {0.0f, 0.015f, 0.03f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 500;
+		uniformBlocksInPool = 200;
 		texturesInPool = 30;
 		setsInPool = 30;
 		
@@ -431,6 +431,8 @@ protected:
 		T25.cleanup();
 		T26.cleanup();
 
+		TBackground.cleanup();
+
 		Cube.cleanup();
 
 		DSL.cleanup();
@@ -448,6 +450,10 @@ protected:
 	void populateCommandBuffer(VkCommandBuffer commandBuffer, int currentImage) {
 		P1.bind(commandBuffer);
 		Cube.bind(commandBuffer);
+
+		DSBackground.bind(commandBuffer, P1, currentImage);
+		vkCmdDrawIndexed(commandBuffer,
+			static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
 		DS1.bind(commandBuffer, P1, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
@@ -556,10 +562,6 @@ protected:
 		DS26.bind(commandBuffer, P3, currentImage);
 		vkCmdDrawIndexed(commandBuffer,
 				static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
-
-		DSBackground.bind(commandBuffer, P3, currentImage);
-		vkCmdDrawIndexed(commandBuffer,
-			static_cast<uint32_t>(Cube.indices.size()), 1, 0, 0, 0);
 
 		txt.populateCommandBuffer(commandBuffer, currentImage);
 	}
@@ -824,9 +826,10 @@ protected:
 		// Here is where you actually update your uniforms
 		// updates global uniforms
 		GlobalUniformBlock gubo{};
-		gubo.DlightDir = glm::normalize(glm::vec3(1, 2, 3));
+		gubo.DlightDir = glm::vec3(cos(glm::radians(135.0f)) * cos(glm::radians(210.0f)),
+			sin(glm::radians(135.0f)), cos(glm::radians(135.0f)) * sin(glm::radians(210.0f)));
 		gubo.DlightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		gubo.AmbLightColor = glm::vec3(0.1f);
+		gubo.AmbLightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 		gubo.eyePos = cameraPos;
 
 		static int a = 2;

@@ -22,7 +22,7 @@ void main() {
 	vec3 L = normalize(gubo.DlightDir);			// light direction
 
 
-    float amb = 5.0f; 
+    float amb = 1.0f; 
 	vec3 albedo = texture(tex, fragUV).rgb;		// main color
 	vec3 MD = albedo;
 	vec3 MS = vec3(1.0f);
@@ -30,7 +30,7 @@ void main() {
 	vec3 LA = gubo.AmbLightColor;
     float gamma = 180.0f;
 	
-	// Write the shader here
+	// Blinn Lambert shader
 	
 	vec3 h = normalize(L + V);
 	
