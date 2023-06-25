@@ -87,6 +87,7 @@ protected:
 	float Yaw = glm::radians(30.0f);
 	float Pitch = glm::radians(22.5f);
 
+	// Rotation parameters
 	float cubeRotSpeed = glm::radians(90.0f);
 	const float rotRange = glm::radians(90.0f);
 
@@ -618,7 +619,7 @@ protected:
 	int dir = 0;
 
 	//create temporary variables for the rotation matrices at the beginning of the rotation
-		//to be used when setting the correct deltaT independent rotation
+	//to be used when setting the correct deltaT independent rotation
 	glm::mat4 startRot[3][3];
 
 	/////////////////////
@@ -630,6 +631,8 @@ protected:
 		static bool showUV = false;
 		static bool changed = false;
 
+		//get inputs from keys if not shuffling
+		//tab used to define direction of rotation
 		if (currShuff == 0 && totShuff == 0) {
 			tl = glfwGetKey(window, GLFW_KEY_L);
 			tr = glfwGetKey(window, GLFW_KEY_R);
@@ -640,15 +643,18 @@ protected:
 			tab = glfwGetKey(window, GLFW_KEY_TAB);
 		}
 
-		if (tl + tr + tu + td + tf + tb && changed == false && rotating == false) {
-			changed = true;
-			if (tf) faceID = 0;
-			if (tb) faceID = 2;
-			if (tu) faceID = 3;
-			if (td) faceID = 5;
-			if (tr) faceID = 8;
-			if (tl) faceID = 6;
-			//std::cout << "reset";
+		//if input detected and no faces rotating, set the faceID of the selected face
+		if (tl + tr + tu + td + tf + tb) {
+			if (changed == false && rotating == false) {
+				changed = true;
+				if (tf) faceID = 0;
+				if (tb) faceID = 2;
+				if (tu) faceID = 3;
+				if (td) faceID = 5;
+				if (tr) faceID = 8;
+				if (tl) faceID = 6;
+				std::cout << "reset";
+			}
 		}
 		else {
 			changed = false;
@@ -666,6 +672,7 @@ protected:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
+		//at the beginning of the rotation save the starting rotation matrix of each cube rotating
 		if (tl+tr+tu+td+tf+tb) {
 
 			if (rotating == false) {
@@ -709,7 +716,7 @@ protected:
 
 		float ang = glm::radians(90.0f);
 		
-		//ending rotation
+		//at the end of the rotation set the final value of each rotation matrix equal to rotation of 90 * starting rotation matrix
 		if (rotating == true && totFaceRot >= ang) {
 			rotating = false;
 
@@ -759,6 +766,8 @@ protected:
 			}
 		}
 
+		//when rotating for each deltaT passed, multiply the current rotation matrix
+		//of each rotating cube by a rotation of an angle dependent on speed and time
 		if (rotating == true) {
 
 			faceRot = cubeRotSpeed * deltaT;
@@ -808,6 +817,8 @@ protected:
 		else {
 		}
 
+		//when shuffling starts, calculate a random number of rotations between 20 and 24
+		//accelerate rotation speed to make the process faster
 		if (glfwGetKey(window, GLFW_KEY_S)) {
 			if (shuffling == false && rotating == false){
 				shuffling = true;
@@ -815,11 +826,15 @@ protected:
 		}
 		else{
 			if (shuffling == true) {
-				totShuff = rand() % 20 + 10;
+				totShuff = rand() % 5 + 20;
 				cubeRotSpeed = glm::radians(450.0f);
 			}
 
 		}
+
+		//at each rotation cycle extract a random face between the main 6 and a random direction
+		//update the corresponding control variable
+		//at the end of the shuffling set speed to starting one
 		if (rotating == false) {
 			if (currShuff < totShuff) {
 				currShuff++;
@@ -1038,6 +1053,8 @@ protected:
 	////////////////////
 	/* 3D array logic */
 	////////////////////
+	//at each rotation update the logic three dimensional array virtualizing the cube
+	//set a face through faceID and cycle between the rest to rotate the 9 cubes of the selected face in the right direction
 	void rotateFace(int(&cube)[3][3][3], int faceID, int dir) {
 		float ang = dir * glm::radians(90.0f);
 		if (faceID < 3) {
