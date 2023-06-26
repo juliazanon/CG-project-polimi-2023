@@ -162,15 +162,15 @@ protected:
 		// Pipelines [Shader couples]
 		// The last array, is a vector of pointer to the layouts of the sets that will
 		// be used in this pipeline. The first element will be set 0, and so on..
-		P1.init(this, &VD, "shaders/Shader1Vert.spv", "shaders/Shader1Frag.spv", {&DSL});
+		P1.init(this, &VD, "shaders/ShaderVert.spv", "shaders/Shader1Frag.spv", {&DSL});
 		P1.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
  								    VK_CULL_MODE_NONE, false);
 
-		P2.init(this, &VD, "shaders/Shader2Vert.spv", "shaders/Shader2Frag.spv", {&DSL});
+		P2.init(this, &VD, "shaders/ShaderVert.spv", "shaders/Shader2Frag.spv", {&DSL});
 		P2.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
 			VK_CULL_MODE_NONE, false);
 
-		P3.init(this, &VD, "shaders/Shader3Vert.spv", "shaders/Shader3Frag.spv", {&DSL});
+		P3.init(this, &VD, "shaders/ShaderVert.spv", "shaders/Shader3Frag.spv", {&DSL});
 		P3.setAdvancedFeatures(VK_COMPARE_OP_LESS, VK_POLYGON_MODE_FILL,
 			VK_CULL_MODE_NONE, false);
 
