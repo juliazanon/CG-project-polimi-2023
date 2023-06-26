@@ -627,8 +627,6 @@ protected:
 	/////////////////////
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage) {
-		static bool showNormal = false;
-		static bool showUV = false;
 		static bool changed = false;
 
 		//get inputs from keys if not shuffling
@@ -644,17 +642,15 @@ protected:
 		}
 
 		//if input detected and no faces rotating, set the faceID of the selected face
-		if (tl + tr + tu + td + tf + tb) {
-			if (changed == false && rotating == false) {
-				changed = true;
-				if (tf) faceID = 0;
-				if (tb) faceID = 2;
-				if (tu) faceID = 3;
-				if (td) faceID = 5;
-				if (tr) faceID = 8;
-				if (tl) faceID = 6;
-				std::cout << "reset";
-			}
+		if (tl + tr + tu + td + tf + tb && !changed && !rotating) {
+			changed = true;
+			if (tf) faceID = 0;
+			if (tb) faceID = 2;
+			if (tu) faceID = 3;
+			if (td) faceID = 5;
+			if (tr) faceID = 8;
+			if (tl) faceID = 6;
+			//std::cout << "reset";
 		}
 		else {
 			changed = false;
@@ -673,81 +669,70 @@ protected:
 		}
 
 		//at the beginning of the rotation save the starting rotation matrix of each cube rotating
-		if (tl+tr+tu+td+tf+tb) {
-
-			if (rotating == false) {
-
-				rotating = true;
-				dir = 2 * tab - 1;
-				if (tr + tu + tb) dir = -dir;
-				rotateFace(cube, faceID, dir);
-
-				if (faceID < 3) {
-					//rotation on z axis
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 3; j++) {
-							//cube rotation through rotation matrix
-							startRot[i][j] = Rotations[cube[faceID][i][j]];
-						}
-					}
-					
-				}
-				else if (faceID < 6) {
-					//rotation on y axis
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 3; j++) {
-							startRot[i][j] = Rotations[cube[j][faceID % 3][i]];
-						}
-					}
-				}
-				else {
-					//rotation on x axis
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 3; j++) {
-							startRot[i][j] = Rotations[cube[j][i][faceID % 3]];
-						}
-					}
-				}
-
-			}
-		}
-		else {
-		}
-
-		float ang = glm::radians(90.0f);
-		
-		//at the end of the rotation set the final value of each rotation matrix equal to rotation of 90 * starting rotation matrix
-		if (rotating == true && totFaceRot >= ang) {
-			rotating = false;
-
-			faceRot = 0.0f;
-			totFaceRot = 0.0f;
-
-			//set face position to the correct one, independent from deltaT at the end of the rotation
+		if (tl+tr+tu+td+tf+tb && !rotating) {
+			rotating = true;
+			dir = 2 * tab - 1;
+			if (tr + tu + tb) dir = -dir;
+			rotateFace(cube, faceID, dir);
 
 			if (faceID < 3) {
 				//rotation on z axis
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 3; j++) {
 						//cube rotation through rotation matrix
+						startRot[i][j] = Rotations[cube[faceID][i][j]];
+					}
+				}
+					
+			}
+			else if (faceID < 6) {
+				//rotation on y axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						startRot[i][j] = Rotations[cube[j][faceID % 3][i]];
+					}
+				}
+			}
+			else {
+				//rotation on x axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						startRot[i][j] = Rotations[cube[j][i][faceID % 3]];
+					}
+				}
+			}
+		}
+		
+		//at the end of the rotation set the final value of each rotation matrix equal to rotation of 90 * starting rotation matrix
+		if (rotating == true && totFaceRot >= rotRange) {
+			rotating = false;
+
+			faceRot = 0.0f;
+			totFaceRot = 0.0f;
+
+			//set face position to the correct one, independent from deltaT at the end of the rotation
+			if (faceID < 3) {
+				//rotation on z axis
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						//cube rotation through rotation matrix
 						Rotations[cube[faceID][i][j]] =
-							glm::mat4(glm::cos(dir * ang), glm::sin(dir * ang), 0, 0,
-								-glm::sin(dir * ang), glm::cos(dir * ang), 0, 0,
+							glm::mat4(glm::cos(dir * rotRange), glm::sin(dir * rotRange), 0, 0,
+								-glm::sin(dir * rotRange), glm::cos(dir * rotRange), 0, 0,
 								0, 0, 1, 0,
 								0, 0, 0, 1) * 
 							startRot[i][j];
 					}
 				}
 			}
-
 			else if (faceID < 6) {
 				//rotation on y axis
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 3; j++) {
 						Rotations[cube[j][faceID % 3][i]] =
-							glm::mat4(glm::cos(dir * ang), 0, glm::sin(dir * ang), 0,
+							glm::mat4(glm::cos(dir * rotRange), 0, glm::sin(dir * rotRange), 0,
 								0, 1, 0, 0,
-								-glm::sin(dir * ang), 0, glm::cos(dir * ang), 0,
+								-glm::sin(dir * rotRange), 0, glm::cos(dir * rotRange), 0,
 								0, 0, 0, 1) * startRot[i][j];
 					}
 				}
@@ -758,8 +743,8 @@ protected:
 					for (int j = 0; j < 3; j++) {
 						Rotations[cube[j][i][faceID % 3]] =
 							glm::mat4(1, 0, 0, 0,
-								0, glm::cos(-(dir * ang)), glm::sin(-(dir * ang)), 0,
-								0, -glm::sin(-(dir * ang)), glm::cos(-(dir * ang)), 0,
+								0, glm::cos(-(dir * rotRange)), glm::sin(-(dir * rotRange)), 0,
+								0, -glm::sin(-(dir * rotRange)), glm::cos(-(dir * rotRange)), 0,
 								0, 0, 0, 1) * startRot[i][j];
 					}
 				}

@@ -16,6 +16,35 @@ layout(binding = 2) uniform GlobalUniformBufferObject {
 
 layout(binding = 1) uniform sampler2D tex;
 
+vec3 BRDF(vec3 V, vec3 N, vec3 L, vec3 Md, float F0, float metallic, float roughness) {
+	//vec3 V  - direction of the viewer
+	//vec3 N  - normal vector to the surface
+	//vec3 L  - light vector (from the light model)
+	//vec3 Md - main color of the surface
+	//float F0 - Base color for the Fresnel term
+	//float metallic - parameter that mixes the diffuse with the specular term.
+	//                 in particular, parmeter K seen in the slides is: float K = 1.0f - metallic;
+	//float roughness - Material roughness (parmeter rho in the slides).
+	//specular color Ms is not passed, and implicitely considered white: vec3 Ms = vec3(1.0f);
+
+	float k = 1.0f - metallic;
+	vec3 Ms = vec3(1.0f);
+
+	vec3 h = normalize(L + V);
+	float D = exp(-(1 - pow(dot(h, N), 2)) / (pow(dot(h, N) * roughness, 2)))/(radians(180) * pow(roughness, 2) * pow(dot(h, N), 4));
+	// float F = F0 + (1 - F0) * pow((1 - clamp(dot(V, h), 0.0, 1.0)), 5);
+	float F = 1;
+	//float G = min(1, min(2 * dot(h, N) * dot(V, N) / dot(V, h), 2 * dot(h, N) * dot(L, N) / dot(V, h))); // Non GGX
+	float ggx1 = 2 / (1 + sqrt(1 + pow(roughness, 2) * (1 - pow(dot(N, V), 2)) / pow(dot(N, V), 2)));
+	float ggx2 = 2 / (1 + sqrt(1 + pow(roughness, 2) * (1 - pow(dot(N, L), 2)) / pow(dot(N, L), 2)));
+	float G = ggx1 * ggx2;
+
+	vec3 diffuse = Md * clamp(dot(L, N), 0.0, 1.0);
+	vec3 specular = Ms * (D * F * G / (4 * clamp(dot(V, N), 0.00001f, 1.0f)));
+
+	return k * diffuse + (1 - k) * specular;
+}
+
 vec3 BRDF(vec3 V, vec3 N, vec3 L, vec3 Md, float sigma) {
 	//vec3 V  - direction of the viewer
 	//vec3 N  - normal vector to the surface
@@ -44,7 +73,7 @@ void main() {
 	vec3 V = normalize(gubo.eyePos - fragPos);	// viewer direction
 	vec3 L = normalize(gubo.DlightDir);			// light direction
 
-	float amb = 1.0f; 
+	float amb = 2.0f; 
 	vec3 albedo = texture(tex, fragUV).rgb;		// main color
 	vec3 MD = albedo;
 	vec3 MS = vec3(1.0f);
@@ -52,10 +81,12 @@ void main() {
 	vec3 LA = gubo.AmbLightColor;
     float gamma = 180.0f;
 	
-	// Oren Nayar shader
-	
-	vec3 DiffSpec = BRDF(V, N, L, MD, 10.0f);
+	// Cook Torrance shader
+	//vec3 DiffSpec = BRDF(V, N, L, MD, 0.3f, 0.5f, 0.5f);
+	// Oren Nayar Shader
+	vec3 DiffSpec = BRDF(V, N, L, MD, 0.0f);
+
 	vec3 Ambient = LA * MA;
-	
-	outColor = vec4(clamp(0.95 * (DiffSpec) * gubo.DlightColor.rgb + Ambient, 0.00001f, 1.0f), 1.0f);
+
+	outColor = vec4(clamp(0.95 * DiffSpec * gubo.DlightColor.rgb + Ambient,0.00001f,1.0f), 1.0f);
 }

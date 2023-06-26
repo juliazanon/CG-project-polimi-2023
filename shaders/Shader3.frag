@@ -21,7 +21,7 @@ void main() {
 	vec3 V = normalize(gubo.eyePos - fragPos);	// viewer direction
 	vec3 L = normalize(gubo.DlightDir);			// light direction
 
-	float amb = 1.0f; 
+	float amb = 3.0f; 
 	vec3 albedo = texture(tex, fragUV).rgb;		// main color
 	vec3 MD = albedo;
 	vec3 MS = vec3(1.0f);
